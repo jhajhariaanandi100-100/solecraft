@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account – SOLECRAFT Atelier{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-500 mx-auto">
+    <div class="card border-0 rounded-4 shadow-lg bg-white p-4 p-md-5">
+      
+      <div class="text-center mb-4">
+        <a href="{{ url_for('main.index') }}">
+          <img src="{{ url_for('static', filename='images/branding/logo.svg') }}" alt="SOLECRAFT" style="height: 38px;">
+        </a>
+        <h3 class="fw-bold text-dark mt-3 mb-1">Create Account</h3>
+        <p class="text-secondary small">Join the SOLECRAFT Atelier to save bespoke builds and enjoy VIP benefits.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-dark">Full Name *</label>
+          <input type="text" name="full_name" class="form-control" placeholder="Alex Rivera" required autofocus>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-dark">Email Address *</label>
+          <input type="email" name="email" class="form-control" placeholder="alex@example.com" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-dark">Phone Number (Optional)</label>
+          <input type="tel" name="phone" class="form-control" placeholder="+1 (555) 000-0000">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-dark">Password * (Min 6 chars)</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-dark">Confirm Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-solecraft-accent py-2 fw-bold">Register Account</button>
+        </div>
+      </form>
+
+      <div class="text-center mt-3 small text-muted">
+        Already registered? <a href="{{ url_for('auth.login') }}" class="text-danger fw-bold text-decoration-none">Sign In Here</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

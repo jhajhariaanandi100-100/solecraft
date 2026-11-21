@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Shop All Footwear – SOLECRAFT Atelier{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Shop Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
+    <div>
+      <h1 class="fw-bold text-dark mb-1">
+        {% if selected_category %}{{ selected_category.name }}{% elif q %}Search results for "{{ q }}"{% else %}All Footwear{% endif %}
+      </h1>
+      <p class="text-muted small mb-0">Showing {{ total_count }} handcrafted footwear silhouettes.</p>
+    </div>
+
+    <!-- Top Action Bar (Sorting & Search) -->
+    <div class="d-flex flex-wrap gap-2 align-items-center mt-3 mt-md-0">
+      <!-- Search Form -->
+      <form method="GET" action="{{ url_for('products.shop') }}" class="d-flex">
+        {% if selected_category %}
+          <input type="hidden" name="category" value="{{ selected_category.slug }}">
+        {% endif %}
+        <div class="input-group input-group-sm">
+          <input type="text" name="q" class="form-control rounded-pill-start border-secondary" placeholder="Search shoes..." value="{{ q }}">
+          <button class="btn btn-dark rounded-pill-end" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+      </form>
+
+      <!-- Sorting Dropdown -->
+      <form method="GET" action="{{ url_for('products.shop') }}" id="sortForm">
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+        {% if current_type %}<input type="hidden" name="type" value="{{ current_type }}">{% endif %}
+        {% if current_gender %}<input type="hidden" name="gender" value="{{ current_gender }}">{% endif %}
+
+        <select name="sort" class="form-select form-select-sm rounded-pill border-secondary" onchange="document.getElementById('sortForm').submit();">
+          <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Sort: Most Popular</option>
+          <option value="price-asc" {% if current_sort == 'price-asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price-desc" {% if current_sort == 'price-desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest Arrivals</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Filter Sidebar -->
+    <div class="col-lg-3">
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white sticky-top" style="top: 100px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0"><i class="bi bi-funnel me-1"></i> Filter By</h5>
+          <a href="{{ url_for('products.shop') }}" class="small text-danger text-decoration-none fw-semibold">Reset All</a>
+        </div>
+
+        <form method="GET" action="{{ url_for('products.shop') }}">
+          {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+          {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+
+          <!-- Categories List -->
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted">Category</label>
+            <div class="d-flex flex-column gap-2">
+              <a href="{{ url_for('products.shop') }}" class="small text-decoration-none {{ 'fw-bold text-danger' if not selected_category else 'text-dark' }}">
+                All Categories
+              </a>
+              {% for c in categories %}
+              <a href="{{ url_for('products.shop', category=c.slug) }}" class="small text-decoration-none {{ 'fw-bold text-danger' if selected_category and selected_category.slug == c.slug else 'text-secondary' }}">
+                {{ c.name }}
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Footwear Type -->
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted">Shoe Type</label>
+            <select name="type" class="form-select form-select-sm rounded-3">
+              <option value="">All Silhouettes</option>
+              <option value="Sneakers" {% if current_type == 'Sneakers' %}selected{% endif %}>Sneakers</option>
+              <option value="Running" {% if current_type == 'Running' %}selected{% endif %}>Running Shoes</option>
+              <option value="Casual" {% if current_type == 'Casual' %}selected{% endif %}>Casual Shoes</option>
+              <option value="Sports" {% if current_type == 'Sports' %}selected{% endif %}>Sports Shoes</option>
+              <option value="Formal" {% if current_type == 'Formal' %}selected{% endif %}>Formal Shoes</option>
+            </select>
+          </div>
+
+          <!-- Gender Fit -->
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted">Gender / Fit</label>
+            <div class="d-flex gap-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="g-all" value="" {% if not current_gender %}checked{% endif %}>
+                <label class="form-check-label small" for="g-all">All</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="g-men" value="Men" {% if current_gender == 'Men' %}checked{% endif %}>
+                <label class="form-check-label small" for="g-men">Men</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="g-women" value="Women" {% if current_gender == 'Women' %}checked{% endif %}>
+                <label class="form-check-label small" for="g-women">Women</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted">Price Range ($)</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Min" value="{{ min_price or '' }}">
+              </div>
+              <div class="col-6">
+                <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Max" value="{{ max_price or '' }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-solecraft-dark btn-sm">Apply Filters</button>
+            <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm">
+              <i class="bi bi-palette-fill me-1"></i> Open Custom Studio
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-lg-9">
+      {% if products %}
+      <div class="row g-4">
+        {% for p in products %}
+        <div class="col-md-4 col-sm-6">
+          <div class="product-card">
+            <div class="product-image-wrap">
+              {% if p.is_bestseller %}
+                <span class="product-card-badge badge-bestseller">Bestseller</span>
+              {% elif p.has_discount %}
+                <span class="product-card-badge badge-discount">-{{ p.discount_percent }}%</span>
+              {% endif %}
+
+              <button type="button" class="wishlist-btn {{ 'active' if p.id in user_wishlist_ids else '' }}" data-product-id="{{ p.id }}" title="Wishlist">
+                <i class="bi bi-heart{{ '-fill' if p.id in user_wishlist_ids else '' }}"></i>
+              </button>
+
+              <img src="{{ p.main_image }}" alt="{{ p.name }}">
+            </div>
+
+            <div class="product-info-wrap">
+              <div class="product-category-tag">{{ p.shoe_type }} • {{ p.gender }}</div>
+              <a href="{{ url_for('products.detail', slug=p.slug) }}" class="product-title">{{ p.name }}</a>
+              <div class="product-material-snippet">{{ p.material }}</div>
+
+              <div class="product-price-row">
+                <div>
+                  <span class="product-price">${{ "%.2f"|format(p.effective_price) }}</span>
+                  {% if p.has_discount %}
+                    <span class="original-price">${{ "%.2f"|format(p.price) }}</span>
+                  {% endif %}
+                </div>
+                <div class="product-rating">
+                  <i class="bi bi-star-fill text-warning"></i>
+                  <span>{{ p.average_rating }}</span>
+                </div>
+              </div>
+
+              <div class="product-action-btns">
+                <button type="button" class="btn-card-quick" data-product-id="{{ p.id }}">
+                  <i class="bi bi-eye me-1"></i> Quick View
+                </button>
+                <a href="{{ url_for('customizer.studio', product=p.slug) }}" class="btn-card-customise">
+                  <i class="bi bi-sliders me-1"></i> Customise
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+        <i class="bi bi-search display-3 text-muted mb-3"></i>
+        <h3 class="fw-bold text-dark">No silhouettes match your query</h3>
+        <p class="text-secondary max-w-500 mx-auto mb-4">Try broadening your search terms or clearing your filters to discover our ready-to-wear or bespoke designs.</p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-dark">View All Footwear</a>
+          <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent">Craft Custom Shoe</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

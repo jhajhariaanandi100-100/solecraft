@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Orders & Production Queue – SOLECRAFT Executive{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 px-lg-5">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <div class="text-muted small text-uppercase fw-bold">Order Management & Fulfillment</div>
+      <h1 class="fw-bold text-dark display-6 mb-0">Customer Orders ({{ orders|length }})</h1>
+    </div>
+
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        &larr; Operations Hub
+      </a>
+      <a href="{{ url_for('admin.custom_orders') }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-3">
+        <i class="bi bi-palette-fill me-1"></i> Bespoke Orders View
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Filter Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ url_for('admin.orders') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if not current_filter else 'btn-outline-secondary' }}">All Statuses</a>
+    <a href="{{ url_for('admin.orders', status='Order Placed') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Order Placed' else 'btn-outline-secondary' }}">Order Placed</a>
+    <a href="{{ url_for('admin.orders', status='Processing') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Processing' else 'btn-outline-secondary' }}">Processing</a>
+    <a href="{{ url_for('admin.orders', status='Customisation in Progress') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Customisation in Progress' else 'btn-outline-secondary' }}">Customisation in Progress</a>
+    <a href="{{ url_for('admin.orders', status='Shipped') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Shipped' else 'btn-outline-secondary' }}">Shipped</a>
+    <a href="{{ url_for('admin.orders', status='Out for Delivery') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Out for Delivery' else 'btn-outline-secondary' }}">Out for Delivery</a>
+    <a href="{{ url_for('admin.orders', status='Delivered') }}" class="btn btn-sm rounded-pill {{ 'btn-dark' if current_filter == 'Delivered' else 'btn-outline-secondary' }}">Delivered</a>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+    <div class="table-responsive">
+      <table class="table align-middle table-hover small">
+        <thead class="table-light text-uppercase">
+          <tr>
+            <th>Order ID</th>
+            <th>Customer & Contact</th>
+            <th>Items Count</th>
+            <th>Amount Paid</th>
+            <th>Payment Details</th>
+            <th>Current Status</th>
+            <th class="text-end">Update Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr>
+            <td class="fw-bold">
+              <a href="{{ url_for('orders.track', order_number=o.order_number) }}" class="text-dark text-decoration-none" target="_blank">
+                {{ o.order_number }} <i class="bi bi-box-arrow-up-right small text-muted"></i>
+              </a>
+              <div class="text-muted" style="font-size: 0.72rem;">{{ o.created_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+            </td>
+
+            <td>
+              <div class="fw-bold text-dark">{{ o.customer_name }}</div>
+              <div class="text-muted" style="font-size: 0.72rem;">{{ o.customer_email }} • {{ o.customer_phone }}</div>
+            </td>
+
+            <td>
+              <span class="badge bg-light text-dark border">{{ o.items|length }} item(s)</span>
+              {% if o.has_custom_items %}
+                <span class="badge bg-warning text-dark">Bespoke</span>
+              {% endif %}
+            </td>
+
+            <td class="fw-bold text-dark">
+              ${{ "%.2f"|format(o.final_amount) }}
+            </td>
+
+            <td>
+              <div>{{ o.payment_method }}</div>
+              <span class="badge {{ 'bg-success' if o.payment_status == 'Paid' else 'bg-warning text-dark' }}" style="font-size: 0.7rem;">
+                {{ o.payment_status }}
+              </span>
+            </td>
+
+            <td>
+              <span class="badge bg-dark py-1 px-2" style="font-size: 0.78rem;">{{ o.status }}</span>
+            </td>
+
+            <!-- Status Changer Dropdown Form -->
+            <td class="text-end">
+              <form method="POST" action="{{ url_for('admin.update_order_status', order_id=o.id) }}" class="d-inline-flex gap-1 align-items-center">
+                <select name="status" class="form-select form-select-sm" style="width: 170px;" onchange="this.form.submit();">
+                  <option value="Order Placed" {% if o.status == 'Order Placed' %}selected{% endif %}>Order Placed</option>
+                  <option value="Processing" {% if o.status == 'Processing' %}selected{% endif %}>Processing</option>
+                  <option value="Customisation in Progress" {% if o.status == 'Customisation in Progress' %}selected{% endif %}>Customisation in Progress</option>
+                  <option value="Shipped" {% if o.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                  <option value="Out for Delivery" {% if o.status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                  <option value="Delivered" {% if o.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                  <option value="Cancelled" {% if o.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center py-5 text-muted">No orders found matching this filter.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

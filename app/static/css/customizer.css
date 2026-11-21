@@ -1,0 +1,370 @@
+/* SOLECRAFT SHOE CUSTOMISATION STUDIO STYLES */
+
+.studio-container {
+  min-height: calc(100vh - 80px);
+  background: #111111;
+  color: #FFFFFF;
+}
+
+/* 3D / SVG Interactive Stage */
+.studio-stage-wrap {
+  position: relative;
+  background: radial-gradient(circle at 50% 45%, #222225 0%, #111113 75%);
+  border-radius: var(--radius-lg);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.7);
+}
+
+.stage-header-tools {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.stage-angle-pills {
+  background: rgba(30, 30, 30, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 30px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+}
+.btn-angle-pill {
+  background: transparent;
+  border: none;
+  color: #A3A3A3;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.btn-angle-pill:hover, .btn-angle-pill.active {
+  background: #FFFFFF;
+  color: #111111;
+}
+
+.stage-action-btns {
+  display: flex;
+  gap: 8px;
+}
+.btn-stage-tool {
+  background: rgba(30, 30, 30, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.btn-stage-tool:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.btn-stage-tool:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* SVG Sneaker Canvas Container */
+.svg-canvas-container {
+  width: 100%;
+  max-width: 640px;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+.svg-canvas-container svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7));
+}
+
+/* Monogram debossed text element inside shoe */
+.monogram-stamp-text {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-anchor: middle;
+  text-transform: uppercase;
+}
+
+/* Studio Control Dock */
+.studio-dock {
+  background: #18181A;
+  border-radius: var(--radius-lg);
+  border: 1px solid #28282C;
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-nav-tabs {
+  display: flex;
+  border-bottom: 1px solid #2A2A2E;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+.studio-tab-btn {
+  background: transparent;
+  border: none;
+  color: #8E8E93;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.studio-tab-btn:hover {
+  color: #FFFFFF;
+}
+.studio-tab-btn.active {
+  background: rgba(255, 107, 53, 0.15);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Silhouette Selection Cards */
+.silhouette-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.silhouette-card {
+  background: #202024;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-align: center;
+}
+.silhouette-card:hover {
+  background: #28282E;
+}
+.silhouette-card.active {
+  border-color: var(--accent);
+  background: rgba(255, 107, 53, 0.08);
+}
+.silhouette-card img {
+  height: 60px;
+  width: auto;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+.silhouette-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.silhouette-price {
+  font-size: 0.75rem;
+  color: #8E8E93;
+}
+
+/* Layer Section Options */
+.part-selector-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.btn-part-choice {
+  background: #222226;
+  border: 1px solid #323238;
+  color: #C7C7CC;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.btn-part-choice:hover, .btn-part-choice.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #FFFFFF;
+}
+
+/* Color Swatches Grid */
+.color-swatches-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.swatch-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.swatch-circle:hover {
+  transform: scale(1.15);
+}
+.swatch-circle.active {
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 3px var(--accent);
+}
+.swatch-circle.active::after {
+  content: '✓';
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 900;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.swatch-circle.is-light.active::after {
+  color: #111111;
+  text-shadow: none;
+}
+
+/* Material Selection Cards */
+.material-card {
+  background: #202024;
+  border: 1px solid #323238;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition-smooth);
+}
+.material-card:hover {
+  border-color: #55555B;
+}
+.material-card.active {
+  border-color: var(--accent);
+  background: rgba(255, 107, 53, 0.08);
+}
+.material-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #FFFFFF;
+}
+.material-desc {
+  font-size: 0.74rem;
+  color: #8E8E93;
+}
+.material-price-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(255, 107, 53, 0.15);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Patterns Grid */
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.pattern-choice-card {
+  background: #202024;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+.pattern-choice-card:hover {
+  background: #28282E;
+}
+.pattern-choice-card.active {
+  border-color: var(--accent);
+  background: rgba(255, 107, 53, 0.1);
+}
+.pattern-preview-box {
+  height: 48px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Monogram Text Input */
+.monogram-input-wrap {
+  background: #202024;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #323238;
+}
+
+/* Price & Action Drawer */
+.studio-pricing-bar {
+  margin-top: auto;
+  background: #111113;
+  border: 1px solid #28282C;
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.price-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #8E8E93;
+  margin-bottom: 6px;
+}
+.price-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 10px;
+  margin-top: 8px;
+  border-top: 1px solid #222226;
+}
+.price-total-val {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #FFFFFF;
+}
+.price-total-val span.currency {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.studio-cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  margin-top: 14px;
+}

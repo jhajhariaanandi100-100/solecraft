@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed – {{ order.order_number }} – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-750 mx-auto">
+    <div class="card border-0 rounded-4 shadow-lg bg-white p-4 p-md-5 text-center">
+      
+      <!-- Checkmark Icon -->
+      <div class="mb-4">
+        <span class="badge bg-success bg-opacity-10 text-success p-3 rounded-circle" style="font-size: 3rem;">
+          <i class="bi bi-check-circle-fill"></i>
+        </span>
+      </div>
+
+      <div class="text-uppercase fw-bold text-success small mb-1">Order Confirmed & Verified</div>
+      <h1 class="fw-bold text-dark display-6 mb-2">Thank you, {{ order.customer_name }}!</h1>
+      <p class="text-secondary mb-4">
+        Your bespoke footwear order has been registered in the SOLECRAFT Atelier system. A confirmation receipt has been sent to <strong>{{ order.customer_email }}</strong>.
+      </p>
+
+      <!-- Order ID Callout Box -->
+      <div class="bg-light p-3 rounded-4 mb-4 border d-flex flex-column flex-sm-row justify-content-between align-items-center">
+        <div class="text-start mb-2 mb-sm-0">
+          <div class="small text-muted text-uppercase fw-bold">Order Identifier</div>
+          <div class="fs-4 fw-bold text-dark">{{ order.order_number }}</div>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-dark px-3 py-2 fs-6">{{ order.status }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex flex-wrap gap-3 justify-content-center mb-5">
+        <a href="{{ url_for('orders.track', order_number=order.order_number) }}" class="btn btn-solecraft-accent px-4 py-2">
+          <i class="bi bi-geo-alt-fill me-1"></i> Track Order Live
+        </a>
+        <a href="{{ url_for('products.shop') }}" class="btn btn-outline-dark px-4 py-2 rounded-pill">
+          Continue Exploring
+        </a>
+      </div>
+
+      <!-- Itemized Receipt -->
+      <div class="text-start border-top pt-4">
+        <h5 class="fw-bold text-dark mb-3">Order Receipt Details</h5>
+
+        <div class="d-flex flex-column gap-3 mb-4">
+          {% for item in order.items %}
+          <div class="d-flex align-items-center justify-content-between pb-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-light rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                <img src="{{ item.item_image or '/static/images/products/custom-default.svg' }}" alt="{{ item.product_name }}" class="img-fluid" style="max-height: 48px; object-fit: contain;">
+              </div>
+              <div>
+                <div class="fw-bold text-dark">{{ item.product_name }}</div>
+                <div class="small text-muted">Size: {{ item.size }} • Qty: {{ item.quantity }}</div>
+                {% if item.is_custom %}
+                  <span class="badge bg-warning text-dark small" style="font-size: 0.7rem;">Handcrafted Bespoke</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="fw-bold text-dark">
+              ${{ "%.2f"|format(item.total_price) }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Receipt Financials -->
+        <div class="row g-3 small">
+          <div class="col-md-6">
+            <div class="fw-bold text-dark mb-1">Delivery Destination:</div>
+            <div class="text-secondary">{{ order.shipping_address_text }}</div>
+            <div class="text-secondary mt-1">Contact: {{ order.customer_phone }}</div>
+            <div class="text-secondary mt-1">Payment: {{ order.payment_method }} ({{ order.payment_status }})</div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Subtotal:</span>
+              <span class="fw-bold text-dark">${{ "%.2f"|format(order.total_amount) }}</span>
+            </div>
+            {% if order.discount_amount > 0 %}
+            <div class="d-flex justify-content-between mb-1 text-success">
+              <span>Coupon Discount:</span>
+              <span class="fw-bold">-${{ "%.2f"|format(order.discount_amount) }}</span>
+            </div>
+            {% endif %}
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Shipping:</span>
+              <span class="fw-bold text-dark">${{ "%.2f"|format(order.shipping_fee) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Sales Tax:</span>
+              <span class="fw-bold text-dark">${{ "%.2f"|format(order.tax_amount) }}</span>
+            </div>
+            <div class="d-flex justify-content-between pt-2 border-top fs-6">
+              <span class="fw-bold text-dark">Total Paid:</span>
+              <span class="fw-bold text-danger fs-5">${{ "%.2f"|format(order.final_amount) }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

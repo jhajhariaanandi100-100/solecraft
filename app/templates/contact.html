@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Concierge Contact – SOLECRAFT Atelier{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-850 mx-auto">
+    <div class="text-center mb-5">
+      <div class="text-uppercase fw-bold text-danger small">Bespoke Concierge</div>
+      <h1 class="fw-bold text-dark display-5 mb-3">Get in Touch with our Atelier</h1>
+      <p class="fs-5 text-secondary">
+        Have inquiries regarding bespoke leather customisation, bulk wedding orders, or tracking assistance? Our concierge is at your service.
+      </p>
+    </div>
+
+    <div class="row g-5">
+      <!-- Contact Form -->
+      <div class="col-lg-7">
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-4 p-md-5">
+          <h4 class="fw-bold text-dark mb-4">Send a Message</h4>
+          <form method="POST" action="{{ url_for('main.contact') }}">
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark">Your Full Name *</label>
+              <input type="text" name="name" class="form-control rounded-3" placeholder="Alex Rivera" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark">Email Address *</label>
+              <input type="email" name="email" class="form-control rounded-3" placeholder="alex@example.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-dark">Subject / Order ID</label>
+              <input type="text" name="subject" class="form-control rounded-3" placeholder="e.g. Custom Studio Question or Order SC-2026-89412">
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-dark">Message *</label>
+              <textarea name="message" class="form-control rounded-3" rows="5" placeholder="How may our bespoke footwear specialists assist you today?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-solecraft-dark w-100 py-2 fw-bold">
+              Dispatch to Concierge <i class="bi bi-send ms-1"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Atelier Details -->
+      <div class="col-lg-5">
+        <div class="card border-0 rounded-4 shadow-sm bg-dark text-white p-4 p-md-5 mb-4" style="background: linear-gradient(135deg, #111111 0%, #1E1E24 100%);">
+          <h5 class="fw-bold text-warning mb-3">Atelier Headquarters</h5>
+          <p class="small text-secondary mb-4">
+            SOLECRAFT Design Studio & Flagship Showroom<br>
+            452 Mercer Street, SoHo District<br>
+            New York, NY 10013, United States
+          </p>
+
+          <h5 class="fw-bold text-warning mb-2">Concierge Hours</h5>
+          <p class="small text-secondary mb-4">
+            Monday – Friday: 09:00 – 20:00 EST<br>
+            Saturday – Sunday: 10:00 – 18:00 EST<br>
+            Direct Response SLA: &lt; 24 Hours
+          </p>
+
+          <h5 class="fw-bold text-warning mb-2">Direct Contact</h5>
+          <p class="small text-secondary mb-0">
+            Email: <span class="text-white">concierge@solecraft.com</span><br>
+            Phone: <span class="text-white">+1 (800) 765-3272</span>
+          </p>
+        </div>
+
+        <div class="card border-0 rounded-4 p-4 bg-light border">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-stars text-danger fs-5"></i>
+            <h6 class="fw-bold text-dark mb-0">Need Instant Recommendations?</h6>
+          </div>
+          <p class="small text-secondary mb-3">
+            Our AI Style Assistant is available 24/7 to match you with your ideal footwear silhouette.
+          </p>
+          <a href="{{ url_for('ai_stylist.assistant') }}" class="btn btn-outline-dark btn-sm rounded-pill">
+            Consult AI Stylist Now &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

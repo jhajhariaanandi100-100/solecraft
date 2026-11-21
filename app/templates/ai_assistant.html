@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}AI Style Assistant – SOLECRAFT Neural Stylist{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-800 mx-auto">
+    
+    <!-- Wizard Card Wrapper -->
+    <div class="card border-0 rounded-4 shadow-lg overflow-hidden bg-white">
+      
+      <!-- Assistant Header -->
+      <div class="bg-dark text-white p-4 p-md-5 position-relative overflow-hidden">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-danger text-uppercase fw-bold px-2 py-1">Neural Style Matcher</span>
+          <span class="text-secondary small">• AI Footwear Curation</span>
+        </div>
+        <h2 class="fw-bold display-6 mb-2">SoleCraft AI Style Assistant</h2>
+        <p class="text-secondary mb-0 small">
+          Answer 5 quick lifestyle questions. Our algorithmic stylist evaluates your anatomical posture, aesthetic vibe, and color preferences to match you with your ideal footwear silhouette.
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="progress mt-4 bg-secondary bg-opacity-25" style="height: 6px;">
+          <div id="ai-progress-bar" class="progress-bar bg-danger transition" role="progressbar" style="width: 20%;"></div>
+        </div>
+      </div>
+
+      <!-- Questionnaire Body -->
+      <div class="p-4 p-md-5">
+
+        <!-- STEP 1: STYLE VIBE -->
+        <div class="ai-wizard-step" id="step-1">
+          <div class="small text-danger fw-bold text-uppercase mb-1">Step 1 of 5</div>
+          <h4 class="fw-bold text-dark mb-3">What is your primary style aesthetic?</h4>
+          <p class="text-muted small mb-4">Choose the vibe that best reflects your everyday rotation.</p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card active cursor-pointer" data-field="vibe" data-value="minimalist">
+                <div class="fw-bold text-dark mb-1">✦ The Urban Minimalist</div>
+                <div class="small text-muted">Clean court silhouettes, monochromatic tones, architectural clarity.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="vibe" data-value="streetwear">
+                <div class="fw-bold text-dark mb-1">✦ High-Top Hype & Street</div>
+                <div class="small text-muted">Bold overlays, ankle collars, high-contrast panels, statement presence.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="vibe" data-value="athletic">
+                <div class="fw-bold text-dark mb-1">✦ Dynamic Performance</div>
+                <div class="small text-muted">Engineered lightweight mesh, responsive nitrogen rebound, marathon agility.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="vibe" data-value="luxury_formal">
+                <div class="fw-bold text-dark mb-1">✦ Bespoke Formal Edge</div>
+                <div class="small text-muted">Goodyear welted box calf, lugged commando soles, black-tie refinement.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-solecraft-dark btn-ai-next">
+              Next Step <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: OCCASION -->
+        <div class="ai-wizard-step d-none" id="step-2">
+          <div class="small text-danger fw-bold text-uppercase mb-1">Step 2 of 5</div>
+          <h4 class="fw-bold text-dark mb-3">Where will you wear these shoes most?</h4>
+          <p class="text-muted small mb-4">We calibrate durability and sole cushioning according to your daily terrain.</p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card active cursor-pointer" data-field="occasion" data-value="daily">
+                <div class="fw-bold text-dark mb-1">Daily Street Walk & Commute</div>
+                <div class="small text-muted">Everyday comfort, breathable lining, all-day arch support.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="occasion" data-value="gym">
+                <div class="fw-bold text-dark mb-1">Fitness, Running & Track</div>
+                <div class="small text-muted">Propulsive energy return, high-traction outsole grip.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="occasion" data-value="work">
+                <div class="fw-bold text-dark mb-1">Office, Studio & Meetings</div>
+                <div class="small text-muted">Polished elevated style bridging business casual and sleek minimalism.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="occasion" data-value="nightout">
+                <div class="fw-bold text-dark mb-1">Night Out, Gallery Walks & Parties</div>
+                <div class="small text-muted">Eye-catching details, custom debossed monograms, bold statements.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-ai-back">Back</button>
+            <button type="button" class="btn btn-solecraft-dark btn-ai-next">
+              Next Step <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: COLOR PALETTE -->
+        <div class="ai-wizard-step d-none" id="step-3">
+          <div class="small text-danger fw-bold text-uppercase mb-1">Step 3 of 5</div>
+          <h4 class="fw-bold text-dark mb-3">Which color palette speaks to your identity?</h4>
+          <p class="text-muted small mb-4">Select your dominant color mood.</p>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card active cursor-pointer" data-field="colors" data-value="monochrome">
+                <div class="fw-bold text-dark mb-1">Monochrome & Stealth</div>
+                <div class="small text-muted">Crisp White, Onyx Black, Slate Grey, and Obsidian Navy.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="colors" data-value="volt_orange">
+                <div class="fw-bold text-dark mb-1">Electric Volt & Orange</div>
+                <div class="small text-muted">High-energy vibrant accents, warm neon touches, bold contrast.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="colors" data-value="earthy">
+                <div class="fw-bold text-dark mb-1">Earthy Tones & Suede</div>
+                <div class="small text-muted">Sand Beige, Forest Green, Tuscan Espresso, Warm Tan.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer" data-field="colors" data-value="pastel">
+                <div class="fw-bold text-dark mb-1">Pastel & Soft Mist</div>
+                <div class="small text-muted">Alabaster White, Rose Quartz, Lavender Mist, Sage.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-ai-back">Back</button>
+            <button type="button" class="btn btn-solecraft-dark btn-ai-next">
+              Next Step <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 4: FOOTWEAR CATEGORY -->
+        <div class="ai-wizard-step d-none" id="step-4">
+          <div class="small text-danger fw-bold text-uppercase mb-1">Step 4 of 5</div>
+          <h4 class="fw-bold text-dark mb-3">What category of footwear do you desire?</h4>
+          <p class="text-muted small mb-4">Choose a target silhouette category or let the AI recommend anything.</p>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card active cursor-pointer text-center" data-field="footwear_type" data-value="all">
+                <div class="fw-bold text-dark mb-1">Surprise Me (All)</div>
+                <div class="small text-muted">Let AI select optimal model</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="footwear_type" data-value="sneakers">
+                <div class="fw-bold text-dark mb-1">Sneakers</div>
+                <div class="small text-muted">Low-tops & High-tops</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="footwear_type" data-value="running-shoes">
+                <div class="fw-bold text-dark mb-1">Running Trainers</div>
+                <div class="small text-muted">Dynamic Road & Track</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="footwear_type" data-value="casual-shoes">
+                <div class="fw-bold text-dark mb-1">Casual & Slip-Ons</div>
+                <div class="small text-muted">Buttery Suede & Court</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="footwear_type" data-value="formal-shoes">
+                <div class="fw-bold text-dark mb-1">Formal Dress Shoes</div>
+                <div class="small text-muted">Derby & Brogues</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-ai-back">Back</button>
+            <button type="button" class="btn btn-solecraft-dark btn-ai-next">
+              Next Step <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 5: BUDGET -->
+        <div class="ai-wizard-step d-none" id="step-5">
+          <div class="small text-danger fw-bold text-uppercase mb-1">Step 5 of 5</div>
+          <h4 class="fw-bold text-dark mb-3">What is your intended investment range?</h4>
+          <p class="text-muted small mb-4">All SOLECRAFT footwear includes our lifetime craftsmanship warranty.</p>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="budget" data-value="under_150">
+                <div class="fw-bold text-dark mb-1">$100 – $150</div>
+                <div class="small text-muted">Accessible luxury entry</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card active cursor-pointer text-center" data-field="budget" data-value="150_220">
+                <div class="fw-bold text-dark mb-1">$150 – $220</div>
+                <div class="small text-muted">Core bespoke tier</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border rounded-3 p-3 ai-choice-card cursor-pointer text-center" data-field="budget" data-value="above_220">
+                <div class="fw-bold text-dark mb-1">$220+</div>
+                <div class="small text-muted">Goodyear-welted & exotic leathers</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-ai-back">Back</button>
+            <button type="button" class="btn btn-solecraft-accent btn-ai-next px-4">
+              <i class="bi bi-stars me-1"></i> Generate My AI Recommendations
+            </button>
+          </div>
+        </div>
+
+        <!-- SIMULATED AI ANALYSIS LOADER SCREEN -->
+        <div class="text-center py-5 d-none" id="ai-loading-screen">
+          <div class="spinner-grow text-danger mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+          <h4 class="fw-bold text-dark mb-2">SoleCraft Neural Stylist at Work...</h4>
+          <p class="text-muted small" id="ai-loader-text">Analyzing your ergonomic lifestyle and aesthetic profile...</p>
+        </div>
+
+        <!-- AI RESULTS CONTAINER -->
+        <div class="d-none" id="ai-results-container">
+          
+          <!-- Archetype Highlight Banner -->
+          <div class="card border-0 rounded-4 p-4 p-md-5 mb-5 text-white" style="background: linear-gradient(135deg, #111111 0%, #222226 100%);">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-danger text-uppercase fw-bold">Your AI Style Archetype</span>
+            </div>
+            <h2 class="display-6 fw-bold mb-2" id="ai-arch-title">The Urban Purist</h2>
+            <p class="fs-5 text-secondary fst-italic mb-3" id="ai-arch-quote">"Understated precision..."</p>
+            <p class="small text-light mb-4" id="ai-summary-text"></p>
+
+            <!-- Customizer Preset Action -->
+            <div class="p-3 bg-dark bg-opacity-75 rounded-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+              <div>
+                <div class="fw-bold text-warning small"><i class="bi bi-palette-fill me-1"></i> Bespoke AI Preset Configured</div>
+                <div class="small text-secondary">Our AI generated a custom colorway & leather spec just for you.</div>
+              </div>
+              <a href="#" id="btn-ai-launch-customizer" class="btn btn-solecraft-accent btn-sm rounded-pill px-4">
+                Launch in 3D Studio <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Curated Products Grid -->
+          <h4 class="fw-bold text-dark mb-3">Top Atelier Recommendations</h4>
+          <div class="row" id="ai-recommendations-grid"></div>
+
+          <!-- Retake Option -->
+          <div class="text-center mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-4" id="btn-ai-retake">
+              <i class="bi bi-arrow-repeat me-1"></i> Retake Questionnaire
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/ai_assistant.js') }}"></script>
+{% endblock %}

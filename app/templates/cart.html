@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Bag – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <h1 class="fw-bold text-dark display-6 mb-0">Your Shopping Bag</h1>
+    <a href="{{ url_for('products.shop') }}" class="small text-danger text-decoration-none fw-semibold">
+      <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+    </a>
+  </div>
+
+  {% if items %}
+  <div class="row g-5">
+    <!-- Cart Items Table Column -->
+    <div class="col-lg-8">
+      <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light small text-uppercase text-secondary">
+              <tr>
+                <th class="ps-4">Product Details</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th class="pe-4 text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items %}
+              <tr>
+                <!-- Product Column -->
+                <td class="ps-4 py-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="bg-light rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 75px; height: 75px;">
+                      <img src="{{ item.display_image }}" alt="{{ item.display_name }}" class="img-fluid" style="max-height: 60px; object-fit: contain;">
+                    </div>
+                    <div>
+                      <div class="fw-bold text-dark mb-1">{{ item.display_name }}</div>
+                      
+                      {% if item.is_custom %}
+                        <span class="badge bg-warning text-dark small mb-1">Bespoke Custom Build</span>
+                        {% set specs = item.custom_design.get_specs() if item.custom_design else {} %}
+                        <div class="small text-muted" style="font-size: 0.76rem;">
+                          Base: {{ specs.get('base_color', 'White') }} • Material: {{ specs.get('upper_material', 'Leather') }}
+                          {% if specs.get('custom_text') %}
+                            • Monogram: <span class="fw-bold text-danger">{{ specs.get('custom_text') }}</span>
+                          {% endif %}
+                        </div>
+                      {% else %}
+                        <div class="small text-muted">{{ item.product.shoe_type }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Size Column -->
+                <td class="fw-semibold text-secondary">
+                  {{ item.size }}
+                </td>
+
+                <!-- Unit Price -->
+                <td class="fw-bold text-dark">
+                  ${{ "%.2f"|format(item.unit_price) }}
+                </td>
+
+                <!-- Quantity Stepper Form -->
+                <td>
+                  <form action="{{ url_for('cart.update_item', item_id=item.id) }}" method="POST" class="d-flex align-items-center gap-1" style="max-width: 100px;">
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="20" class="form-control form-control-sm text-center fw-bold rounded-3" onchange="this.form.submit();">
+                  </form>
+                </td>
+
+                <!-- Line Total -->
+                <td class="fw-bold text-dark">
+                  ${{ "%.2f"|format(item.line_total) }}
+                </td>
+
+                <!-- Remove Button -->
+                <td class="pe-4 text-end">
+                  <form action="{{ url_for('cart.remove_item', item_id=item.id) }}" method="POST">
+                    <button type="submit" class="btn btn-sm text-muted hover-danger border-0" title="Remove Item">
+                      <i class="bi bi-trash3 fs-5"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bespoke Advisory Callout -->
+      <div class="alert alert-light border rounded-4 mt-4 p-3 d-flex align-items-center gap-3">
+        <i class="bi bi-shield-check fs-3 text-success"></i>
+        <div class="small text-secondary">
+          <strong>The SoleCraft Craftsmanship Pledge:</strong> Every bespoke pair is hand-lasted by master shoemakers with Italian leathers and acoustic quality tested before packaging.
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary Column -->
+    <div class="col-lg-4">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 sticky-top" style="top: 100px;">
+        <h4 class="fw-bold text-dark mb-4">Order Summary</h4>
+
+        <!-- Coupon Promo Code Box -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-secondary">Have a Promo Code?</label>
+          {% if applied_coupon %}
+            <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 border">
+              <div>
+                <span class="badge bg-success me-1">{{ applied_coupon.code }}</span>
+                <span class="small text-muted">Applied (${{ "%.2f"|format(coupon_discount) }} off)</span>
+              </div>
+              <form action="{{ url_for('cart.remove_coupon') }}" method="POST">
+                <button type="submit" class="btn btn-sm text-danger p-0 fw-bold border-0">Remove</button>
+              </form>
+            </div>
+          {% else %}
+            <form action="{{ url_for('cart.apply_coupon') }}" method="POST">
+              <div class="input-group">
+                <input type="text" name="coupon_code" class="form-control text-uppercase" placeholder="e.g. WELCOME20" required>
+                <button class="btn btn-dark" type="submit">Apply</button>
+              </div>
+            </form>
+            <div class="small text-muted mt-1">Try codes: <code>WELCOME20</code> or <code>SOLE10</code></div>
+          {% endif %}
+        </div>
+
+        <!-- Financial Breakdown -->
+        <div class="d-flex justify-content-between text-secondary mb-2 small">
+          <span>Subtotal</span>
+          <span class="fw-bold text-dark">${{ "%.2f"|format(subtotal) }}</span>
+        </div>
+
+        {% if coupon_discount > 0 %}
+        <div class="d-flex justify-content-between text-success mb-2 small">
+          <span>Coupon Discount</span>
+          <span class="fw-bold">-${{ "%.2f"|format(coupon_discount) }}</span>
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between text-secondary mb-2 small">
+          <span>Estimated Shipping</span>
+          {% if shipping_fee == 0 %}
+            <span class="fw-bold text-success">FREE (Orders > $150)</span>
+          {% else %}
+            <span class="fw-bold text-dark">${{ "%.2f"|format(shipping_fee) }}</span>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between text-secondary mb-3 small pb-3 border-bottom">
+          <span>Estimated Sales Tax (5%)</span>
+          <span class="fw-bold text-dark">${{ "%.2f"|format(tax_amount) }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-baseline mb-4">
+          <span class="fs-5 fw-bold text-dark">Estimated Total</span>
+          <span class="fs-3 fw-bold text-dark">${{ "%.2f"|format(final_total) }}</span>
+        </div>
+
+        <!-- Checkout Button -->
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('orders.checkout') }}" class="btn btn-solecraft-accent py-3 fw-bold">
+            Proceed to Checkout <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+          <a href="{{ url_for('customizer.studio') }}" class="btn btn-outline-dark btn-sm rounded-pill py-2">
+            <i class="bi bi-palette-fill me-1"></i> Customise Another Silhouette
+          </a>
+        </div>
+
+        <div class="text-center mt-3">
+          <small class="text-muted"><i class="bi bi-lock-fill me-1"></i> 256-Bit Encrypted Secure Checkout</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+    <i class="bi bi-bag-x display-3 text-muted mb-3"></i>
+    <h3 class="fw-bold text-dark">Your bag is currently empty</h3>
+    <p class="text-secondary max-w-500 mx-auto mb-4">
+      Explore our ready-to-wear collections or open the 3D Customizer Studio to design your first bespoke sneaker.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-dark">Explore Ready-to-Wear</a>
+      <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent">Launch Custom Studio</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SOLECRAFT – Personalise Your Every Step{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/branding/favicon.svg') }}">
+  
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom Design System Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/customizer.css') }}">
+  
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar text-center">
+    <span>Free Bespoke Shipping On Orders Over $150</span>
+    <span class="badge-promo">Code: WELCOME20 for 20% Off</span>
+    <span class="d-none d-md-inline ms-3 text-muted">|</span>
+    <span class="d-none d-md-inline ms-3"><i class="bi bi-shield-check me-1"></i> Lifetime Craftsmanship Guarantee</span>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-solecraft">
+    <div class="container">
+      <!-- Brand Logo -->
+      <a class="navbar-brand-solecraft" href="{{ url_for('main.index') }}">
+        <img src="{{ url_for('static', filename='images/branding/logo.svg') }}" alt="SOLECRAFT">
+      </a>
+
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('main.index') }}">Home</a>
+          </li>
+          
+          <!-- Shop Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link nav-link-custom dropdown-toggle" href="{{ url_for('products.shop') }}" role="button" data-bs-toggle="dropdown">
+              Shop Collection
+            </a>
+            <ul class="dropdown-menu border-0 shadow-lg rounded-3 py-2">
+              <li><a class="dropdown-item fw-bold text-dark py-2" href="{{ url_for('products.shop') }}">All Footwear</a></li>
+              <li><hr class="dropdown-divider"></li>
+              {% for cat in nav_categories %}
+                <li>
+                  <a class="dropdown-item py-2" href="{{ url_for('products.shop', category=cat.slug) }}">
+                    {{ cat.name }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+
+          <!-- Custom Studio (Hero Feature) -->
+          <li class="nav-item ms-lg-2">
+            <a class="nav-link nav-link-custom badge-customizer" href="{{ url_for('customizer.studio') }}">
+              <i class="bi bi-palette-fill text-warning"></i> Custom Studio ✦
+            </a>
+          </li>
+
+          <!-- AI Stylist -->
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('ai_stylist.assistant') }}">
+              <i class="bi bi-stars text-danger me-1"></i> AI Stylist
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('main.how_it_works') }}">How It Works</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link nav-link-custom" href="{{ url_for('orders.track') }}">Track Order</a>
+          </li>
+        </ul>
+
+        <!-- Right Action Icons -->
+        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+          <!-- Shopping Bag -->
+          <a href="{{ url_for('cart.view_cart') }}" class="nav-icon-btn" title="Shopping Bag">
+            <i class="bi bi-bag"></i>
+            <span class="cart-badge-pill" style="display: {{ 'flex' if cart_count > 0 else 'none' }};">
+              {{ cart_count }}
+            </span>
+          </a>
+
+          <!-- User Account Dropdown -->
+          <div class="dropdown">
+            <button class="nav-icon-btn dropdown-toggle border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 py-2">
+              {% if current_user.is_authenticated %}
+                <li class="px-3 py-2 border-bottom">
+                  <div class="small text-muted">Signed in as</div>
+                  <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">{{ current_user.full_name }}</div>
+                </li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('auth.profile') }}"><i class="bi bi-person-gear me-2"></i> My Profile & Orders</a></li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('auth.profile') }}#designs"><i class="bi bi-palette me-2"></i> Saved Custom Designs</a></li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('auth.profile') }}#wishlist"><i class="bi bi-heart me-2"></i> Wishlist</a></li>
+                {% if current_user.is_admin %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item py-2 text-danger fw-bold" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> Executive Dashboard</a></li>
+                {% endif %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2 text-muted" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
+              {% else %}
+                <li><a class="dropdown-item py-2 fw-bold" href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right me-2"></i> Sign In</a></li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('auth.register') }}"><i class="bi bi-person-plus me-2"></i> Create Account</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="px-3 py-1">
+                  <small class="text-muted d-block">Demo Customer: customer@solecraft.com / customer123</small>
+                  <small class="text-muted d-block mt-1">Demo Admin: admin@solecraft.com / admin123</small>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- CTA Custom Studio -->
+          <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm d-none d-xl-inline-flex">
+            Create Your Sole
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages Banner -->
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 shadow-sm border-0 d-flex align-items-center justify-content-between py-3 px-4" role="alert">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+              <span>{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Quick View Modal -->
+  <div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+        <div class="modal-body p-0">
+          <div class="row g-0">
+            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
+              <img id="qv-img" src="" alt="Product" class="img-fluid" style="max-height: 280px; object-fit: contain;">
+            </div>
+            <div class="col-md-6 p-4 d-flex flex-direction-column">
+              <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
+              <div class="product-category-tag" id="qv-category">SNEAKERS</div>
+              <h4 class="fw-bold text-dark mb-1" id="qv-title">Product Title</h4>
+              <p class="small text-muted mb-2 fst-italic" id="qv-tagline"></p>
+              <div class="product-price mb-3" id="qv-price">$0.00</div>
+              <p class="small text-secondary mb-3" id="qv-desc"></p>
+              <div class="small fw-semibold text-dark mb-2">Material: <span id="qv-material" class="fw-normal text-muted"></span></div>
+              
+              <!-- Quick Add Form -->
+              <form id="qv-cart-form" class="mt-3">
+                <input type="hidden" name="product_id" id="qv-product-id">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold text-dark">Select Size</label>
+                  <select name="size" id="qv-sizes" class="form-select form-select-sm rounded-3"></select>
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-solecraft-dark">
+                    <i class="bi bi-bag-plus me-1"></i> Add to Bag
+                  </button>
+                  <a href="#" id="qv-link" class="btn btn-solecraft-outline btn-sm">View Full Details</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Guide Modal -->
+  <div class="modal fade" id="sizeGuideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 rounded-4 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="fw-bold">SOLECRAFT Footwear Size Conversion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="small text-muted mb-3">All SOLECRAFT sneakers and shoes are sculpted true-to-size according to standard US brannock measurements. For wide feet, we recommend ordering half a size up.</p>
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center align-middle">
+              <thead class="table-dark">
+                <tr><th>US Men</th><th>US Women</th><th>UK</th><th>EU</th><th>CM</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>7.0</td><td>8.5</td><td>6.0</td><td>40</td><td>25.0</td></tr>
+                <tr><td>8.0</td><td>9.5</td><td>7.0</td><td>41</td><td>26.0</td></tr>
+                <tr><td>9.0</td><td>10.5</td><td>8.0</td><td>42.5</td><td>27.0</td></tr>
+                <tr><td>10.0</td><td>11.5</td><td>9.0</td><td>44</td><td>28.0</td></tr>
+                <tr><td>11.0</td><td>12.5</td><td>10.0</td><td>45</td><td>29.0</td></tr>
+                <tr><td>12.0</td><td>13.5</td><td>11.0</td><td>46</td><td>30.0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Footer -->
+  <footer class="footer-solecraft">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Brand Bio -->
+        <div class="col-lg-4 col-md-6">
+          <img src="{{ url_for('static', filename='images/branding/logo.svg') }}" alt="SOLECRAFT" class="mb-3" style="height: 38px; filter: brightness(0) invert(1);">
+          <p class="small text-secondary pe-lg-4">
+            SOLECRAFT is an avant-garde bespoke footwear atelier bridging precision engineering, Italian leather craftsmanship, and real-time generative footwear design.
+          </p>
+          <div class="d-flex gap-3 mt-3 text-secondary">
+            <a href="#" class="text-white text-decoration-none fs-5"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="text-white text-decoration-none fs-5"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="text-white text-decoration-none fs-5"><i class="bi bi-youtube"></i></a>
+            <a href="#" class="text-white text-decoration-none fs-5"><i class="bi bi-pinterest"></i></a>
+          </div>
+        </div>
+
+        <!-- Collections Links -->
+        <div class="col-lg-2 col-md-3 col-6">
+          <div class="footer-heading">Collections</div>
+          <a href="{{ url_for('products.shop', category='sneakers') }}" class="footer-link">Sneakers</a>
+          <a href="{{ url_for('products.shop', category='running-shoes') }}" class="footer-link">Running Shoes</a>
+          <a href="{{ url_for('products.shop', category='casual-shoes') }}" class="footer-link">Casual Shoes</a>
+          <a href="{{ url_for('products.shop', category='formal-shoes') }}" class="footer-link">Formal Shoes</a>
+          <a href="{{ url_for('products.shop', category='unisex-collection') }}" class="footer-link">Unisex Series</a>
+        </div>
+
+        <!-- Bespoke Studio Links -->
+        <div class="col-lg-2 col-md-3 col-6">
+          <div class="footer-heading">Bespoke Studio</div>
+          <a href="{{ url_for('customizer.studio') }}" class="footer-link text-warning fw-semibold">3D Custom Studio</a>
+          <a href="{{ url_for('ai_stylist.assistant') }}" class="footer-link">AI Style Assistant</a>
+          <a href="{{ url_for('orders.track') }}" class="footer-link">Live Order Tracking</a>
+          <a href="{{ url_for('main.how_it_works') }}" class="footer-link">How It Works</a>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#sizeGuideModal" class="footer-link">Size Guide</a>
+        </div>
+
+        <!-- Newsletter Subscription -->
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-heading">The SoleCraft Inner Circle</div>
+          <p class="small text-secondary mb-3">
+            Subscribe for secret bespoke drops, VIP customizer early access, and a 15% discount on your first bespoke order.
+          </p>
+          <form class="newsletter-form position-relative">
+            <div class="input-group">
+              <input type="email" class="form-control rounded-pill-start bg-dark border-secondary text-white px-3" placeholder="Enter your email address" required>
+              <button class="btn btn-solecraft-accent rounded-pill-end px-3" type="submit">Join</button>
+            </div>
+          </form>
+          <div class="small text-muted mt-2">
+            <i class="bi bi-lock me-1"></i> We respect your privacy. Unsubscribe at any time.
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div>
+          &copy; 2026 SOLECRAFT Atelier Inc. All rights reserved. "Your Style. Your Design. Your Sole."
+        </div>
+        <div class="d-flex gap-4 mt-2 mt-md-0">
+          <a href="{{ url_for('main.about') }}" class="text-secondary text-decoration-none small">About Us</a>
+          <a href="{{ url_for('main.contact') }}" class="text-secondary text-decoration-none small">Concierge</a>
+          <a href="#" class="text-secondary text-decoration-none small">Privacy Policy</a>
+          <a href="#" class="text-secondary text-decoration-none small">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="solecraft-toast-container"></div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Main Script -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

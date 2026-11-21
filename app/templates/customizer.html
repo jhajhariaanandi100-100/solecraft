@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}3D Bespoke Shoe Customisation Studio – SOLECRAFT{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background-color: #0D0D0E !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="studio-container py-4">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Studio Header Bar -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 pb-3 border-bottom border-dark">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-warning text-dark text-uppercase fw-bold px-2 py-1">Atelier Studio Lab</span>
+          <span class="text-secondary small">• Layered SVG Live Generative Engine</span>
+        </div>
+        <h2 class="fw-bold text-white mb-0 display-6">Bespoke Shoe Customiser</h2>
+      </div>
+
+      <div class="d-flex gap-2 mt-3 mt-md-0">
+        <a href="{{ url_for('ai_stylist.assistant') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+          <i class="bi bi-stars text-danger me-1"></i> Consult AI Stylist
+        </a>
+        <a href="{{ url_for('products.shop') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          Back to Ready-to-Wear
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- LEFT COLUMN: 3D / SVG INTERACTIVE STAGE -->
+      <div class="col-xl-7 col-lg-6">
+        <div class="studio-stage-wrap">
+          
+          <!-- Top Tool Controls (Angle, Undo/Redo, Reset) -->
+          <div class="stage-header-tools">
+            <!-- View Angle Pills -->
+            <div class="stage-angle-pills">
+              <button type="button" class="btn-angle-pill active" data-angle="lateral">
+                <i class="bi bi-eye me-1"></i> Lateral View
+              </button>
+              <button type="button" class="btn-angle-pill" data-angle="medial">
+                <i class="bi bi-arrow-left-right me-1"></i> Medial Profile
+              </button>
+            </div>
+
+            <!-- Action Buttons (Undo, Redo, Reset) -->
+            <div class="stage-action-btns">
+              <button type="button" class="btn-stage-tool" id="btn-undo" title="Undo Step" disabled>
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+              <button type="button" class="btn-stage-tool" id="btn-redo" title="Redo Step" disabled>
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+              <button type="button" class="btn-stage-tool" id="btn-reset" title="Reset to Factory">
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- THE SVG SNEAKER CANVAS (Layered Render) -->
+          <div class="svg-canvas-container my-auto">
+            <svg id="solecraft-live-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+              <defs>
+                <filter id="dropShadow" x="-20%" y="-20%" width="150%" height="150%">
+                  <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity="0.6" />
+                </filter>
+                <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+                  <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity="0.35" />
+                </filter>
+                <linearGradient id="accentGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#FF6B35" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#FF8C5A" stop-opacity="0.2" />
+                </linearGradient>
+              </defs>
+
+              <!-- Floor Contact Shadow -->
+              <ellipse cx="300" cy="345" rx="230" ry="22" fill="#000000" opacity="0.6" filter="blur(10px)" />
+
+              <!-- SNEAKER BODY GROUP -->
+              <g filter="url(#dropShadow)" id="svg-shoe-stage">
+                <!-- Sole / Outsole & Midsole -->
+                <path id="svg-sole" d="M 80 275 L 515 275 C 518 305, 480 330, 440 330 L 100 330 C 80 330, 75 305, 80 275 Z" fill="#FFFFFF" stroke="#333333" stroke-width="1" />
+                <!-- Tread Groove details -->
+                <line x1="120" y1="322" x2="470" y2="322" stroke="#444444" stroke-width="2" stroke-dasharray="10 8" opacity="0.5" />
+
+                <!-- Base Upper -->
+                <path id="svg-upper" d="M 95 275 C 110 190, 175 170, 240 180 L 330 195 C 400 215, 460 240, 505 275 L 95 275 Z" fill="#FFFFFF" stroke="#444444" stroke-width="0.8" />
+
+                <!-- Overlay Quarter / Vamp Panel -->
+                <path id="svg-quarter" d="M 95 275 C 90 220, 130 180, 180 180 L 195 275 Z" fill="#111111" opacity="0.95" />
+
+                <!-- Collar & Lining -->
+                <path id="svg-collar" d="M 140 180 C 170 155, 225 155, 250 180 Z" fill="#1A1A1A" />
+
+                <!-- Tongue -->
+                <path id="svg-tongue" d="M 170 160 L 230 165 L 225 195 L 165 190 Z" fill="#111111" />
+
+                <!-- Pattern Layer (dynamically injected SVG elements) -->
+                <g id="svg-pattern-layer"></g>
+
+                <!-- Signature Wave / Brand Accent -->
+                <path id="svg-swoosh" d="M 170 225 Q 300 190, 420 250 Q 330 245, 220 255 Z" fill="#FF6B35" filter="url(#softShadow)" />
+
+                <!-- Heel Tab -->
+                <path id="svg-heel" d="M 85 210 L 98 210 L 95 270 L 85 270 Z" fill="#FF6B35" />
+
+                <!-- Eyestay & Laces Group -->
+                <g id="svg-laces-group">
+                  <line x1="230" y1="185" x2="248" y2="193" stroke="#FF6B35" stroke-width="4.5" stroke-linecap="round" />
+                  <line x1="260" y1="200" x2="278" y2="208" stroke="#FF6B35" stroke-width="4.5" stroke-linecap="round" />
+                  <line x1="290" y1="215" x2="308" y2="223" stroke="#FF6B35" stroke-width="4.5" stroke-linecap="round" />
+                  <line x1="320" y1="230" x2="338" y2="238" stroke="#FF6B35" stroke-width="4.5" stroke-linecap="round" />
+                  <line x1="350" y1="245" x2="368" y2="253" stroke="#FF6B35" stroke-width="4.5" stroke-linecap="round" />
+                </g>
+
+                <!-- Stitching lines -->
+                <path d="M 120 270 C 130 200, 180 190, 240 195" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.4" />
+
+                <!-- Monogram Text Deboss -->
+                <text id="svg-monogram-text" class="monogram-stamp-text" x="135" y="245" font-size="12" fill="#FFFFFF" style="display: none;"></text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="small text-secondary text-center mt-3">
+            <i class="bi bi-info-circle me-1"></i> Live interactive vector rendering. Every color and material tweak renders in real-time.
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: STUDIO CONTROL DOCK -->
+      <div class="col-xl-5 col-lg-6">
+        <div class="studio-dock">
+          
+          <!-- Control Dock Tabs -->
+          <div class="studio-nav-tabs">
+            <button type="button" class="studio-tab-btn active" data-tab="silhouette">
+              <i class="bi bi-grid-fill"></i> Silhouette
+            </button>
+            <button type="button" class="studio-tab-btn" data-tab="parts">
+              <i class="bi bi-palette-fill"></i> Colors
+            </button>
+            <button type="button" class="studio-tab-btn" data-tab="materials">
+              <i class="bi bi-layers-fill"></i> Materials
+            </button>
+            <button type="button" class="studio-tab-btn" data-tab="patterns">
+              <i class="bi bi-brush-fill"></i> Patterns
+            </button>
+            <button type="button" class="studio-tab-btn" data-tab="monogram">
+              <i class="bi bi-fonts"></i> Monogram
+            </button>
+          </div>
+
+          <!-- TAB 1: SILHOUETTES -->
+          <div class="studio-tab-pane" id="tab-silhouette">
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Choose Your Base Silhouette</label>
+            <div class="silhouette-grid">
+              <!-- Retro Low -->
+              <div class="silhouette-card active" data-type="retro_low">
+                <img src="{{ url_for('static', filename='images/products/retro-low-white.svg') }}" alt="Retro Low">
+                <div class="silhouette-title">Retro Low '77</div>
+                <div class="silhouette-price">From $160.00</div>
+              </div>
+
+              <!-- Apex High -->
+              <div class="silhouette-card" data-type="high_top">
+                <img src="{{ url_for('static', filename='images/products/apex-high-black.svg') }}" alt="Apex High">
+                <div class="silhouette-title">Apex High-Top</div>
+                <div class="silhouette-price">From $195.00</div>
+              </div>
+
+              <!-- Aero Runner -->
+              <div class="silhouette-card" data-type="aeroknit_runner">
+                <img src="{{ url_for('static', filename='images/products/aero-runner-orange.svg') }}" alt="Aero Runner">
+                <div class="silhouette-title">AeroStrata Runner</div>
+                <div class="silhouette-price">From $180.00</div>
+              </div>
+
+              <!-- Urban Slip-on -->
+              <div class="silhouette-card" data-type="urban_slipon">
+                <img src="{{ url_for('static', filename='images/products/milano-slipon.svg') }}" alt="Urban Slip-on">
+                <div class="silhouette-title">Milano Slip-On</div>
+                <div class="silhouette-price">From $165.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: COMPONENT PARTS & COLOR PALETTE -->
+          <div class="studio-tab-pane d-none" id="tab-parts">
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-2">1. Select Shoe Component</label>
+            <div class="part-selector-row">
+              <button type="button" class="btn-part-choice active" data-part="base">Base Upper</button>
+              <button type="button" class="btn-part-choice" data-part="upper">Quarter Overlay</button>
+              <button type="button" class="btn-part-choice" data-part="sole">Outsole & Midsole</button>
+              <button type="button" class="btn-part-choice" data-part="laces">Laces</button>
+              <button type="button" class="btn-part-choice" data-part="tongue">Tongue</button>
+              <button type="button" class="btn-part-choice" data-part="heel">Heel Tab</button>
+              <button type="button" class="btn-part-choice" data-part="swoosh">Signature Wave</button>
+            </div>
+
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-2">2. Apply Atelier Colorway</label>
+            <div class="color-swatches-grid">
+              <!-- Palette Swatches -->
+              <div class="swatch-circle active is-light" data-color="#FFFFFF" style="background: #FFFFFF;" title="Pristine White"></div>
+              <div class="swatch-circle" data-color="#111111" style="background: #111111;" title="Onyx Black"></div>
+              <div class="swatch-circle" data-color="#FF6B35" style="background: #FF6B35;" title="Electric Sunset Volt"></div>
+              <div class="swatch-circle" data-color="#2B2D42" style="background: #2B2D42;" title="Obsidian Midnight"></div>
+              <div class="swatch-circle" data-color="#8D99AE" style="background: #8D99AE;" title="Slate Mist"></div>
+              <div class="swatch-circle" data-color="#E63946" style="background: #E63946;" title="Crimson Red"></div>
+              <div class="swatch-circle is-light" data-color="#D4AF37" style="background: #D4AF37;" title="Metallic Gold"></div>
+              <div class="swatch-circle is-light" data-color="#EAE7DC" style="background: #EAE7DC;" title="Alabaster Ecru"></div>
+              <div class="swatch-circle" data-color="#4A5859" style="background: #4A5859;" title="Deep Forest"></div>
+              <div class="swatch-circle" data-color="#735CDD" style="background: #735CDD;" title="Cyber Purple"></div>
+              <div class="swatch-circle" data-color="#553D36" style="background: #553D36;" title="Espresso Brown"></div>
+              <div class="swatch-circle" data-color="#00ADB5" style="background: #00ADB5;" title="Neon Cyan"></div>
+            </div>
+          </div>
+
+          <!-- TAB 3: MATERIALS -->
+          <div class="studio-tab-pane d-none" id="tab-materials">
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Select Upper Material Finish</label>
+            
+            <div class="material-card active" data-material="Italian Leather">
+              <div>
+                <div class="material-name">Full-Grain Italian Calfskin</div>
+                <div class="material-desc">Hand-buffed natural grain, buttery soft, maximum durability.</div>
+              </div>
+              <span class="material-price-badge">+$20.00</span>
+            </div>
+
+            <div class="material-card" data-material="Nubuck Suede">
+              <div>
+                <div class="material-name">Velour Nubuck Suede</div>
+                <div class="material-desc">Sanded velvet texture, rich color saturation, luxury feel.</div>
+              </div>
+              <span class="material-price-badge">+$15.00</span>
+            </div>
+
+            <div class="material-card" data-material="AeroKnit Mesh">
+              <div>
+                <div class="material-name">AeroKnit Engineered Mesh</div>
+                <div class="material-desc">Featherlight dynamic breathability, sports agility.</div>
+              </div>
+              <span class="material-price-badge">+$10.00</span>
+            </div>
+
+            <div class="material-card" data-material="Vintage Canvas">
+              <div>
+                <div class="material-name">Organic Duck Canvas</div>
+                <div class="material-desc">Heavyweight organic cotton, retro skate court heritage.</div>
+              </div>
+              <span class="material-price-badge">Included</span>
+            </div>
+
+            <div class="material-card" data-material="Metallic Platinum">
+              <div>
+                <div class="material-name">Platinum Sheen Metallic</div>
+                <div class="material-desc">Futuristic reflective high-luster finish for statements.</div>
+              </div>
+              <span class="material-price-badge">+$30.00</span>
+            </div>
+          </div>
+
+          <!-- TAB 4: PATTERNS -->
+          <div class="studio-tab-pane d-none" id="tab-patterns">
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Add Signature Graphic Overlay (+$12.00)</label>
+            <div class="pattern-grid">
+              <div class="pattern-choice-card active" data-pattern="none">
+                <div class="pattern-preview-box bg-dark text-white">None</div>
+                <div class="small fw-bold text-white">Solid Clean</div>
+              </div>
+
+              <div class="pattern-choice-card" data-pattern="racing_stripe">
+                <div class="pattern-preview-box bg-dark text-warning">///</div>
+                <div class="small fw-bold text-white">Racing Stripe</div>
+              </div>
+
+              <div class="pattern-choice-card" data-pattern="camo">
+                <div class="pattern-preview-box bg-dark text-success">☁</div>
+                <div class="small fw-bold text-white">Urban Camo</div>
+              </div>
+
+              <div class="pattern-choice-card" data-pattern="geometric">
+                <div class="pattern-preview-box bg-dark text-info">▨</div>
+                <div class="small fw-bold text-white">Geometric Grid</div>
+              </div>
+
+              <div class="pattern-choice-card" data-pattern="gradient">
+                <div class="pattern-preview-box bg-dark text-danger">☀</div>
+                <div class="small fw-bold text-white">Sunset Glow</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: MONOGRAM / PERSONALIZED INITIALS -->
+          <div class="studio-tab-pane d-none" id="tab-monogram">
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-3">Personal Monogram Debossing (+$10.00)</label>
+            <div class="monogram-input-wrap mb-4">
+              <label class="form-label small text-muted">Enter Initials, Moniker or Digits (Max 10 chars)</label>
+              <input type="text" id="monogram-input" class="form-control bg-dark border-secondary text-white text-uppercase fw-bold" placeholder="e.g. SC-77" maxlength="10">
+              <small class="text-secondary d-block mt-2">
+                <i class="bi bi-shield-lock me-1"></i> Laser-engraved with precision on the outer heel counter.
+              </small>
+            </div>
+
+            <label class="form-label small fw-bold text-uppercase text-secondary mb-2">Monogram Foil Color</label>
+            <div class="d-flex gap-3">
+              <div class="swatch-circle mono-color-swatch active is-light" data-color="#FFFFFF" style="background: #FFFFFF;" title="White"></div>
+              <div class="swatch-circle mono-color-swatch" data-color="#111111" style="background: #111111;" title="Black"></div>
+              <div class="swatch-circle mono-color-swatch is-light" data-color="#D4AF37" style="background: #D4AF37;" title="Gold Foil"></div>
+              <div class="swatch-circle mono-color-swatch" data-color="#FF6B35" style="background: #FF6B35;" title="Sunset Volt"></div>
+            </div>
+          </div>
+
+          <!-- BOTTOM PRICING & ACTION DOCK -->
+          <div class="studio-pricing-bar">
+            <div class="price-breakdown-row">
+              <span>Base Silhouette</span>
+              <span id="price-breakdown-base">$160.00</span>
+            </div>
+            <div class="price-breakdown-row">
+              <span>Upper Material</span>
+              <span id="price-breakdown-mat">+$20.00</span>
+            </div>
+            <div class="price-breakdown-row">
+              <span>Graphic Pattern</span>
+              <span id="price-breakdown-pat">$0.00</span>
+            </div>
+            <div class="price-breakdown-row">
+              <span>Personal Monogram</span>
+              <span id="price-breakdown-mono">$0.00</span>
+            </div>
+
+            <div class="price-total-row">
+              <div>
+                <div class="small text-uppercase text-secondary fw-bold">Estimated Total</div>
+                <div class="small text-muted">Includes custom bespoke tooling</div>
+              </div>
+              <div class="price-total-val">
+                <span class="currency">$</span><span id="studio-price-val">180.00</span>
+              </div>
+            </div>
+
+            <!-- Size Selector for Bespoke Order -->
+            <div class="mt-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Select Size for this Build</label>
+              <select id="custom-size-select" class="form-select form-select-sm bg-dark border-secondary text-white rounded-3">
+                <option value="US 7">US 7.0 (EU 40)</option>
+                <option value="US 8">US 8.0 (EU 41)</option>
+                <option value="US 8.5">US 8.5 (EU 42)</option>
+                <option value="US 9" selected>US 9.0 (EU 42.5)</option>
+                <option value="US 9.5">US 9.5 (EU 43)</option>
+                <option value="US 10">US 10.0 (EU 44)</option>
+                <option value="US 10.5">US 10.5 (EU 44.5)</option>
+                <option value="US 11">US 11.0 (EU 45)</option>
+                <option value="US 12">US 12.0 (EU 46)</option>
+              </select>
+            </div>
+
+            <!-- CTA Action Buttons -->
+            <div class="studio-cta-grid">
+              <button type="button" class="btn btn-outline-light rounded-pill py-2" id="btn-save-design">
+                <i class="bi bi-bookmark me-1"></i> Save to Vault
+              </button>
+              <button type="button" class="btn btn-solecraft-accent rounded-pill py-2" id="btn-add-custom-cart">
+                <i class="bi bi-bag-plus me-1"></i> Add Bespoke to Bag
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/customizer.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const initialSpecs = {{ initial_specs|safe if initial_specs else 'null' }};
+    window.initSoleCraftStudio(initialSpecs);
+  });
+</script>
+{% endblock %}

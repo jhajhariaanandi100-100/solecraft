@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works – Bespoke Footwear Process – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-850 mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="text-uppercase fw-bold text-danger small">The Bespoke Workflow</div>
+      <h1 class="fw-bold text-dark display-5 mb-3">From Studio Canvas to Your Footstep</h1>
+      <p class="fs-5 text-secondary">
+        Discover how your custom specifications transform into hand-stitched reality at the SOLECRAFT Atelier.
+      </p>
+    </div>
+
+    <!-- Stepper Breakdown -->
+    <div class="d-flex flex-column gap-4 mb-5">
+      <!-- Step 1 -->
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+        <div class="row align-items-center g-4">
+          <div class="col-md-2 text-center">
+            <div class="step-number mb-0">01</div>
+          </div>
+          <div class="col-md-10">
+            <div class="text-danger small fw-bold text-uppercase">The Base Architecture</div>
+            <h4 class="fw-bold text-dark mb-2">Select Your Silhouette</h4>
+            <p class="small text-secondary mb-0">
+              Begin by selecting your foundation: the timeless <strong>Retro Low '77</strong> for court aesthetics, the architectural <strong>Apex High-Top</strong> for high-collar street presence, the <strong>AeroStrata Runner</strong> for lightweight athletic pacing, or the <strong>Milano Slip-On</strong> for effortless Italian suede luxury.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+        <div class="row align-items-center g-4">
+          <div class="col-md-2 text-center">
+            <div class="step-number mb-0">02</div>
+          </div>
+          <div class="col-md-10">
+            <div class="text-danger small fw-bold text-uppercase">Component Customization</div>
+            <h4 class="fw-bold text-dark mb-2">Curate Leathers, Finishes & Colors</h4>
+            <p class="small text-secondary mb-0">
+              In our interactive 3D/SVG Studio, independently select the colorway for your base upper, quarter panel, sole unit, laces, tongue, and heel counter. Choose between Italian full-grain calfskin, velour nubuck suede, engineered sport mesh, or metallic platinum luster.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+        <div class="row align-items-center g-4">
+          <div class="col-md-2 text-center">
+            <div class="step-number mb-0">03</div>
+          </div>
+          <div class="col-md-10">
+            <div class="text-danger small fw-bold text-uppercase">Personal Monogram</div>
+            <h4 class="fw-bold text-dark mb-2">Laser-Deboss Your Initials</h4>
+            <p class="small text-secondary mb-0">
+              Imprint your personal signature. Add your initials, lucky numbers, or brand mark (up to 10 characters). Preview the debossed foil stamp in gold, white, black, or electric volt directly on the heel counter.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+        <div class="row align-items-center g-4">
+          <div class="col-md-2 text-center">
+            <div class="step-number mb-0">04</div>
+          </div>
+          <div class="col-md-10">
+            <div class="text-danger small fw-bold text-uppercase">Handcraft & Delivery</div>
+            <h4 class="fw-bold text-dark mb-2">Artisan Lasting & White-Glove Dispatch</h4>
+            <p class="small text-secondary mb-0">
+              Once you confirm your order, our cobbler team receives the digital blueprint. Leathers are hand-cut, bonded, lasting pinned, and hand-stitched. Your customized pair undergoes acoustic rebound testing and ships in our velvet-lined collector's box with live milestone tracking.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start Building CTA -->
+    <div class="text-center py-4">
+      <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-lg px-5 py-3 shadow">
+        <i class="bi bi-palette-fill me-2"></i> Launch 3D Studio Now
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

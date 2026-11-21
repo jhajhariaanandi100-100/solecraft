@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Atelier Dashboard – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 px-lg-5">
+  
+  <!-- Top Admin Bar -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-danger text-uppercase fw-bold px-2 py-1">Executive Portal</span>
+        <span class="text-muted small">• Live Production Analytics</span>
+      </div>
+      <h1 class="fw-bold text-dark display-6 mb-0">Atelier Operations Hub</h1>
+    </div>
+
+    <!-- Quick Navigation Pills -->
+    <div class="d-flex flex-wrap gap-2 mt-3 mt-md-0">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-dark btn-sm rounded-pill px-3 active">
+        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+      </a>
+      <a href="{{ url_for('admin.products') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+        <i class="bi bi-box-seam me-1"></i> Products & Inventory
+      </a>
+      <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+        <i class="bi bi-receipt me-1"></i> All Orders
+      </a>
+      <a href="{{ url_for('admin.custom_orders') }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-3">
+        <i class="bi bi-palette-fill me-1"></i> Bespoke Custom Orders ({{ custom_orders_count }})
+      </a>
+      <a href="{{ url_for('admin.coupons') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+        <i class="bi bi-tag me-1"></i> Coupons
+      </a>
+    </div>
+  </div>
+
+  <!-- 4 PRIMARY KPI CARDS -->
+  <div class="row g-4 mb-5">
+    <!-- Total Revenue -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-uppercase small fw-bold text-muted">Total Revenue</span>
+          <span class="badge bg-success bg-opacity-10 text-success p-2 rounded-circle fs-6"><i class="bi bi-currency-dollar"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">${{ "%.2f"|format(total_sales) }}</div>
+        <div class="small text-success mt-2"><i class="bi bi-arrow-up-right me-1"></i> Verified across all payment gateways</div>
+      </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-uppercase small fw-bold text-muted">Total Orders Placed</span>
+          <span class="badge bg-primary bg-opacity-10 text-primary p-2 rounded-circle fs-6"><i class="bi bi-bag-check"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ total_orders }}</div>
+        <div class="small text-muted mt-2">Ready-to-wear & bespoke deliveries</div>
+      </div>
+    </div>
+
+    <!-- Bespoke Custom Builds -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-uppercase small fw-bold text-muted">Bespoke Custom Shoes</span>
+          <span class="badge bg-warning bg-opacity-10 text-warning p-2 rounded-circle fs-6"><i class="bi bi-palette"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ custom_orders_count }}</div>
+        <div class="small text-warning mt-2"><i class="bi bi-stars me-1"></i> Hand-crafted through 3D Studio</div>
+      </div>
+    </div>
+
+    <!-- Registered Customers -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-uppercase small fw-bold text-muted">Registered Clients</span>
+          <span class="badge bg-danger bg-opacity-10 text-danger p-2 rounded-circle fs-6"><i class="bi bi-people"></i></span>
+        </div>
+        <div class="fs-2 fw-bold text-dark">{{ total_customers }}</div>
+        <div class="small text-muted mt-2">Active atelier accounts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS CHARTS ROW (Chart.js) -->
+  <div class="row g-4 mb-5">
+    <!-- Revenue Trend Chart -->
+    <div class="col-lg-8">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0">Sales Revenue Trend (Recent Days)</h5>
+          <span class="badge bg-light text-dark border">Daily Velocity</span>
+        </div>
+        <canvas id="revenueTrendChart" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Category Breakdown Doughnut -->
+    <div class="col-lg-4">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4 h-100">
+        <h5 class="fw-bold text-dark mb-3">Inventory by Category</h5>
+        <canvas id="categoryDoughnutChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ORDERS TABLE -->
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0">Recent Orders</h5>
+          <a href="{{ url_for('admin.orders') }}" class="small text-danger text-decoration-none fw-semibold">View All Orders &rarr;</a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle table-hover small">
+            <thead class="table-light text-uppercase">
+              <tr>
+                <th>Order Number</th>
+                <th>Client</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Placed</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ord in recent_orders %}
+              <tr>
+                <td class="fw-bold">{{ ord.order_number }}</td>
+                <td>
+                  <div>{{ ord.customer_name }}</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">{{ ord.customer_email }}</div>
+                </td>
+                <td class="fw-bold">${{ "%.2f"|format(ord.final_amount) }}</td>
+                <td>
+                  <span class="badge bg-dark">{{ ord.status }}</span>
+                </td>
+                <td class="text-muted">{{ ord.created_at.strftime('%b %d, %Y') }}</td>
+                <td>
+                  <a href="{{ url_for('orders.track', order_number=ord.order_number) }}" class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                    Inspect
+                  </a>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" class="text-center py-4 text-muted">No orders recorded yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT CLIENTS -->
+    <div class="col-lg-4">
+      <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+        <h5 class="fw-bold text-dark mb-3">New Client Registrations</h5>
+        <div class="d-flex flex-column gap-3">
+          {% for u in recent_customers %}
+          <div class="d-flex align-items-center justify-content-between pb-2 border-bottom">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.8rem;">
+                {{ u.full_name[:2].upper() }}
+              </div>
+              <div>
+                <div class="fw-bold text-dark small">{{ u.full_name }}</div>
+                <div class="text-muted" style="font-size: 0.72rem;">{{ u.email }}</div>
+              </div>
+            </div>
+            <span class="small text-muted">{{ u.created_at.strftime('%b %d') }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  window.adminChartData = {
+    dateLabels: {{ date_labels|tojson }},
+    revenueData: {{ revenue_data|tojson }}
+  };
+  window.adminCatData = {
+    labels: {{ cat_labels|tojson }},
+    counts: {{ cat_counts|tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

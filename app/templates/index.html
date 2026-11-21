@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}SOLECRAFT – Don't Just Wear Shoes. Create Them.{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="container position-relative">
+    <div class="row align-items-center g-5">
+      <!-- Hero Copy -->
+      <div class="col-lg-6">
+        <div class="hero-tagline-badge">
+          <i class="bi bi-patch-check-fill text-warning"></i>
+          {{ brand_tagline }}
+        </div>
+        <h1 class="hero-title">
+          Don't Just Wear Shoes. <br>
+          <span class="text-gradient">Create Them.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Welcome to the new era of bespoke footwear. Hand-select your Italian leathers, calibrate your sole performance, add your personal monogram stamp, and experience footwear made uniquely for you.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-lg px-4 py-3 shadow">
+            <i class="bi bi-palette-fill me-2"></i> Customise Your Shoes
+          </a>
+          <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-outline btn-lg px-4 py-3 text-white border-secondary">
+            Explore Ready-to-Wear <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="row g-3 mt-4 pt-4 border-top border-secondary border-opacity-25 text-secondary">
+          <div class="col-4">
+            <div class="fw-bold text-white fs-5">100%</div>
+            <div class="small">Full-Grain Italian Calf</div>
+          </div>
+          <div class="col-4">
+            <div class="fw-bold text-white fs-5">0.1mm</div>
+            <div class="small">Anatomical Fit Precision</div>
+          </div>
+          <div class="col-4">
+            <div class="fw-bold text-white fs-5">4.9 ★</div>
+            <div class="small">Verified Atelier Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Sneaker Display -->
+      <div class="col-lg-6">
+        <div class="hero-shoe-display">
+          <img src="{{ url_for('static', filename='images/products/retro-low-white.svg') }}" alt="SoleCraft Signature Sneaker" class="hero-shoe-img">
+
+          <!-- Floating Specs Pills -->
+          <div class="hero-specs-pill pill-1">
+            <span class="badge bg-warning p-2 rounded-circle text-dark"><i class="bi bi-hand-index-thumb"></i></span>
+            <div>
+              <div class="fw-bold">Interactive 3D Studio</div>
+              <div class="small text-muted">Layer-by-layer customization</div>
+            </div>
+          </div>
+
+          <div class="hero-specs-pill pill-2">
+            <span class="badge bg-danger p-2 rounded-circle"><i class="bi bi-feather"></i></span>
+            <div>
+              <div class="fw-bold">Ultra-light Rebound</div>
+              <div class="small text-muted">Nitrogen-infused foam core</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FEATURED COLLECTIONS -->
+<section class="py-5 mt-4">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+      <div>
+        <div class="text-uppercase fw-bold text-danger small letter-spacing-1">Curated Series</div>
+        <h2 class="fw-bold text-dark mb-0">Featured Collections</h2>
+      </div>
+      <a href="{{ url_for('products.shop') }}" class="btn btn-link text-dark fw-bold text-decoration-none mt-2 mt-md-0">
+        View All Collections <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for cat in categories[:4] %}
+      <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100 bg-white hover-shadow transition">
+          <div class="p-4 bg-light text-center">
+            <i class="bi bi-gem fs-1 text-danger mb-2 d-block"></i>
+            <h5 class="fw-bold text-dark mb-1">{{ cat.name }}</h5>
+            <p class="small text-muted mb-3" style="min-height: 40px;">{{ cat.description }}</p>
+            <a href="{{ url_for('products.shop', category=cat.slug) }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+              Explore {{ cat.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- BESTSELLING PRODUCTS -->
+<section class="py-5 bg-white border-top border-bottom border-light">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+      <div>
+        <div class="text-uppercase fw-bold text-danger small">Tastemaker Favorites</div>
+        <h2 class="fw-bold text-dark mb-0">Bestselling Silhouettes</h2>
+      </div>
+      <div class="d-flex gap-2 mt-3 mt-md-0">
+        <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm">
+          <i class="bi bi-palette me-1"></i> Customise Any Design
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for p in bestsellers %}
+      <div class="col-lg-3 col-md-6">
+        <div class="product-card">
+          <div class="product-image-wrap">
+            {% if p.is_bestseller %}
+              <span class="product-card-badge badge-bestseller">Bestseller</span>
+            {% elif p.has_discount %}
+              <span class="product-card-badge badge-discount">-{{ p.discount_percent }}%</span>
+            {% endif %}
+
+            <button type="button" class="wishlist-btn" data-product-id="{{ p.id }}" title="Save to Wishlist">
+              <i class="bi bi-heart"></i>
+            </button>
+
+            <img src="{{ p.main_image }}" alt="{{ p.name }}">
+          </div>
+
+          <div class="product-info-wrap">
+            <div class="product-category-tag">{{ p.shoe_type }}</div>
+            <a href="{{ url_for('products.detail', slug=p.slug) }}" class="product-title">{{ p.name }}</a>
+            <div class="product-material-snippet">{{ p.material }}</div>
+
+            <div class="product-price-row">
+              <div>
+                <span class="product-price">${{ "%.2f"|format(p.effective_price) }}</span>
+                {% if p.has_discount %}
+                  <span class="original-price">${{ "%.2f"|format(p.price) }}</span>
+                {% endif %}
+              </div>
+              <div class="product-rating">
+                <i class="bi bi-star-fill text-warning"></i>
+                <span>{{ p.average_rating }}</span>
+              </div>
+            </div>
+
+            <div class="product-action-btns">
+              <button type="button" class="btn-card-quick" data-product-id="{{ p.id }}">
+                <i class="bi bi-eye me-1"></i> Quick View
+              </button>
+              <a href="{{ url_for('customizer.studio', product=p.slug) }}" class="btn-card-customise">
+                <i class="bi bi-sliders me-1"></i> Customise
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- HOW IT WORKS SECTION -->
+<section class="py-5 my-4">
+  <div class="container">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <div class="text-uppercase fw-bold text-danger small letter-spacing-1">The Bespoke Process</div>
+      <h2 class="fw-bold text-dark display-6">How SOLECRAFT Works</h2>
+      <p class="text-muted">Four simple steps from your creative imagination to your doorstep.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-3 col-sm-6">
+        <div class="feature-box text-center">
+          <div class="step-number">01</div>
+          <h5 class="fw-bold text-dark mb-2">Select Silhouette</h5>
+          <p class="small text-muted">
+            Choose from heritage court lows, architectural high-tops, aerodynamic runners, or minimalist slip-ons.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="feature-box text-center">
+          <div class="step-number">02</div>
+          <h5 class="fw-bold text-dark mb-2">Curate Colors & Leathers</h5>
+          <p class="small text-muted">
+            Customize uppers, laces, midsoles, heel tabs, and outsoles using full-grain Italian leather or suede.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="feature-box text-center">
+          <div class="step-number">03</div>
+          <h5 class="fw-bold text-dark mb-2">Deboss Initials</h5>
+          <p class="small text-muted">
+            Add your initials, moniker, or personalized digits laser-engraved onto the heel counter.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="feature-box text-center">
+          <div class="step-number">04</div>
+          <h5 class="fw-bold text-dark mb-2">Artisan Handcraft</h5>
+          <p class="small text-muted">
+            Our atelier cobblers hand-stitch your pair, run acoustic quality checks, and dispatch with tracking.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- AI STYLIST PROMO CALLOUT -->
+<section class="py-5" style="background: linear-gradient(135deg, #1A1A1A 0%, #111111 100%);">
+  <div class="container py-4">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8 text-white">
+        <span class="badge bg-danger text-uppercase fw-bold px-3 py-2 mb-3">AI Style Assistant ✦</span>
+        <h2 class="fw-bold display-6 mb-3">Not sure which silhouette fits your vibe?</h2>
+        <p class="text-secondary fs-5 mb-0">
+          Answer 5 quick lifestyle questions. Our neural styling assistant analyzes your aesthetic, preferred colorway, and occasion to engineer your dream shoe configuration.
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="{{ url_for('ai_stylist.assistant') }}" class="btn btn-solecraft-accent btn-lg px-4 py-3">
+          <i class="bi bi-stars me-2"></i> Launch AI Stylist
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- WHY CHOOSE SOLECRAFT -->
+<section class="py-5 bg-white border-top border-bottom border-light">
+  <div class="container my-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <div class="text-uppercase fw-bold text-danger small">Atelier Philosophy</div>
+      <h2 class="fw-bold text-dark display-6">Why Choose SOLECRAFT</h2>
+      <p class="text-muted">We reject mass assembly lines in favor of individual craftsmanship and pure expression.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-box">
+          <div class="feature-icon-wrap"><i class="bi bi-shield-check"></i></div>
+          <h5 class="fw-bold text-dark">Italian Tuscan Leather</h5>
+          <p class="small text-muted mb-0">
+            Every hide is hand-selected from certified Italian tanneries, ensuring buttery-soft feel that patinates with beauty.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-box">
+          <div class="feature-icon-wrap"><i class="bi bi-sliders"></i></div>
+          <h5 class="fw-bold text-dark">Zero Fake Renderings</h5>
+          <p class="small text-muted mb-0">
+            Our Custom Studio provides actual layer-by-layer SVG & canvas rendering with 100% color-true accuracy.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-box">
+          <div class="feature-icon-wrap"><i class="bi bi-recycle"></i></div>
+          <h5 class="fw-bold text-dark">Zero Mass Overproduction</h5>
+          <p class="small text-muted mb-0">
+            By crafting on-demand and on-order, we eliminate the 30% unsold footwear waste typical of fast-fashion conglomerates.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- TESTIMONIALS -->
+<section class="py-5">
+  <div class="container my-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <div class="text-uppercase fw-bold text-danger small">Social Proof</div>
+      <h2 class="fw-bold text-dark display-6">Words from our Tastemakers</h2>
+      <p class="text-muted">Join over 15,000 creators, athletes, and collectors worldwide.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card border-0 rounded-4 p-4 shadow-sm h-100 bg-white">
+          <div class="text-warning mb-3">★★★★★</div>
+          <p class="fst-italic text-secondary small mb-3">
+            "I spent an evening in the Custom Studio dialing in a Retro Low with sunset volt accents and my initials stamped on the heel. When the box arrived, the leather aroma and build quality blew my mind."
+          </p>
+          <div class="d-flex align-items-center gap-3 mt-auto">
+            <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px;">AR</div>
+            <div>
+              <div class="fw-bold text-dark small">Alex Rivera</div>
+              <div class="small text-muted">Architect & Sneaker Collector</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 rounded-4 p-4 shadow-sm h-100 bg-white">
+          <div class="text-warning mb-3">★★★★★</div>
+          <p class="fst-italic text-secondary small mb-3">
+            "The AI Style Assistant recommended the AeroStrata Hyper-Runner based on my daily 8km pacing. The cushioning rebound is featherlight, and not seeing anyone else on the track with the same colorway is incredible."
+          </p>
+          <div class="d-flex align-items-center gap-3 mt-auto">
+            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px;">SK</div>
+            <div>
+              <div class="fw-bold text-dark small">Sarah Kendrick</div>
+              <div class="small text-muted">Marathon Runner</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 rounded-4 p-4 shadow-sm h-100 bg-white">
+          <div class="text-warning mb-3">★★★★★</div>
+          <p class="fst-italic text-secondary small mb-3">
+            "Ordered the Kallisto Derby with lugged commando soles for gallery openings. The Goodyear welt is impeccable. SOLECRAFT is genuinely redefining bespoke footwear for the modern era."
+          </p>
+          <div class="d-flex align-items-center gap-3 mt-auto">
+            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px;">ML</div>
+            <div>
+              <div class="fw-bold text-dark small">Marcus Vance</div>
+              <div class="small text-muted">Creative Director, NYC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

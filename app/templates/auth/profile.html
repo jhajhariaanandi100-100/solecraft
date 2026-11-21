@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}My Atelier Profile – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Profile Header Card -->
+  <div class="card border-0 rounded-4 shadow-sm bg-white p-4 p-md-5 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 70px; height: 70px;">
+          {{ current_user.full_name[:2].upper() }}
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h2 class="fw-bold text-dark mb-0">{{ current_user.full_name }}</h2>
+            <span class="badge {{ 'bg-danger' if current_user.is_admin else 'bg-secondary' }}">{{ current_user.role.title() }}</span>
+          </div>
+          <div class="text-muted small mt-1">
+            <i class="bi bi-envelope me-1"></i> {{ current_user.email }}
+            {% if current_user.phone %}<span class="ms-3"><i class="bi bi-telephone me-1"></i> {{ current_user.phone }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-3">
+          <i class="bi bi-palette-fill me-1"></i> Open Studio
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          Sign Out
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Navigation Tabs -->
+  <ul class="nav nav-pills mb-4 gap-2" id="profileTab" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active rounded-pill px-4 fw-bold" id="orders-tab" data-bs-toggle="pill" data-bs-target="#orders-pane" type="button">
+        <i class="bi bi-box-seam me-1"></i> Order History ({{ orders|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill px-4 fw-bold" id="designs-tab" data-bs-toggle="pill" data-bs-target="#designs-pane" type="button">
+        <i class="bi bi-palette me-1"></i> Saved Custom Designs ({{ designs|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill px-4 fw-bold" id="wishlist-tab" data-bs-toggle="pill" data-bs-target="#wishlist-pane" type="button">
+        <i class="bi bi-heart me-1"></i> Wishlist ({{ wishlist|length }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill px-4 fw-bold" id="address-tab" data-bs-toggle="pill" data-bs-target="#address-pane" type="button">
+        <i class="bi bi-geo-alt me-1"></i> Saved Addresses ({{ addresses|length }})
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="profileTabContent">
+    
+    <!-- 1. ORDERS TAB -->
+    <div class="tab-pane fade show active" id="orders-pane">
+      {% if orders %}
+        <div class="d-flex flex-column gap-3">
+          {% for ord in orders %}
+          <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-3 border-bottom">
+              <div>
+                <span class="badge bg-danger text-uppercase fw-bold px-2 py-1 mb-1">{{ ord.status }}</span>
+                <h5 class="fw-bold text-dark mb-0">Order: {{ ord.order_number }}</h5>
+                <div class="small text-muted">Placed on {{ ord.created_at.strftime('%B %d, %Y') }} • Payment: {{ ord.payment_method }} ({{ ord.payment_status }})</div>
+              </div>
+              <div class="mt-2 mt-md-0 d-flex align-items-center gap-3">
+                <div class="text-md-end">
+                  <div class="small text-muted">Total Amount</div>
+                  <div class="fs-5 fw-bold text-dark">${{ "%.2f"|format(ord.final_amount) }}</div>
+                </div>
+                <a href="{{ url_for('orders.track', order_number=ord.order_number) }}" class="btn btn-solecraft-dark btn-sm">
+                  <i class="bi bi-geo-alt me-1"></i> Track Order
+                </a>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div class="d-flex flex-column gap-2">
+              {% for itm in ord.items %}
+              <div class="d-flex align-items-center justify-content-between small text-secondary">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold text-dark">{{ itm.product_name }}</span>
+                  <span>(Size: {{ itm.size }}, Qty: {{ itm.quantity }})</span>
+                  {% if itm.is_custom %}
+                    <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Bespoke</span>
+                  {% endif %}
+                </div>
+                <span class="fw-bold text-dark">${{ "%.2f"|format(itm.total_price) }}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+          <i class="bi bi-box2 display-4 text-muted mb-3"></i>
+          <h4 class="fw-bold text-dark">No orders yet</h4>
+          <p class="text-secondary small max-w-400 mx-auto mb-4">When you place orders for ready-to-wear or bespoke designs, they will appear here with live tracking milestones.</p>
+          <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-dark btn-sm rounded-pill px-4 mx-auto">Explore Footwear</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 2. SAVED CUSTOM DESIGNS TAB -->
+    <div class="tab-pane fade" id="designs-pane">
+      {% if designs %}
+        <div class="row g-4">
+          {% for des in designs %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden h-100">
+              <div class="p-3 bg-light text-center position-relative">
+                <span class="badge bg-dark position-absolute top-0 start-0 m-3">{{ des.shoe_type.replace('_', ' ').title() }}</span>
+                <img src="{{ des.preview_image or '/static/images/products/custom-default.svg' }}" alt="{{ des.title }}" class="img-fluid" style="max-height: 160px; object-fit: contain;">
+              </div>
+              <div class="p-4 d-flex flex-column flex-grow-1">
+                <h5 class="fw-bold text-dark mb-1">{{ des.title }}</h5>
+                <div class="small text-muted mb-2">
+                  Material: {{ des.upper_material }}
+                  {% if des.custom_text %}
+                    • Monogram: <span class="fw-bold text-danger">{{ des.custom_text }}</span>
+                  {% endif %}
+                </div>
+                <div class="d-flex justify-content-between align-items-baseline mt-auto pt-3 border-top">
+                  <span class="fs-5 fw-bold text-dark">${{ "%.2f"|format(des.calculated_price) }}</span>
+                  <a href="{{ url_for('customizer.studio', load=des.id) }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-3">
+                    <i class="bi bi-palette-fill me-1"></i> Load in Studio
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+          <i class="bi bi-palette display-4 text-muted mb-3"></i>
+          <h4 class="fw-bold text-dark">No custom designs saved yet</h4>
+          <p class="text-secondary small max-w-400 mx-auto mb-4">Open our 3D Customizer Studio to customize silhouettes, select Italian leathers, and save your personal builds.</p>
+          <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-4 mx-auto">Launch Customizer</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 3. WISHLIST TAB -->
+    <div class="tab-pane fade" id="wishlist-pane">
+      {% if wishlist %}
+        <div class="row g-4">
+          {% for w in wishlist %}
+          <div class="col-md-4 col-sm-6">
+            <div class="product-card">
+              <div class="product-image-wrap">
+                <button type="button" class="wishlist-btn active" data-product-id="{{ w.product.id }}" title="Remove from Wishlist">
+                  <i class="bi bi-heart-fill"></i>
+                </button>
+                <img src="{{ w.product.main_image }}" alt="{{ w.product.name }}">
+              </div>
+              <div class="product-info-wrap">
+                <div class="product-category-tag">{{ w.product.shoe_type }}</div>
+                <a href="{{ url_for('products.detail', slug=w.product.slug) }}" class="product-title">{{ w.product.name }}</a>
+                <div class="product-price-row">
+                  <span class="product-price">${{ "%.2f"|format(w.product.effective_price) }}</span>
+                  <a href="{{ url_for('products.detail', slug=w.product.slug) }}" class="btn btn-sm btn-solecraft-dark">View Product</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+          <i class="bi bi-heart display-4 text-muted mb-3"></i>
+          <h4 class="fw-bold text-dark">Your wishlist is empty</h4>
+          <p class="text-secondary small max-w-400 mx-auto mb-4">Tap the heart icon on any silhouette in the shop to bookmark it for later.</p>
+          <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-dark btn-sm rounded-pill px-4 mx-auto">Explore Shop</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 4. SAVED ADDRESSES TAB -->
+    <div class="tab-pane fade" id="address-pane">
+      <div class="row g-4">
+        <!-- Existing Addresses -->
+        <div class="col-lg-6">
+          <h5 class="fw-bold text-dark mb-3">Delivery Locations</h5>
+          {% if addresses %}
+            {% for a in addresses %}
+            <div class="card border rounded-3 p-3 mb-3 bg-white">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold text-dark">{{ a.full_name }}</span>
+                {% if a.is_default %}<span class="badge bg-success">Default</span>{% endif %}
+              </div>
+              <div class="small text-secondary">{{ a.formatted() }}</div>
+              <div class="small text-muted mt-1"><i class="bi bi-telephone me-1"></i> {{ a.phone }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="small text-muted">No addresses saved yet. Add your primary delivery address below.</p>
+          {% endif %}
+        </div>
+
+        <!-- Add Address Form -->
+        <div class="col-lg-6">
+          <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+            <h5 class="fw-bold text-dark mb-3">Add New Shipping Address</h5>
+            <form method="POST" action="{{ url_for('auth.add_address') }}">
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Full Name *</label>
+                <input type="text" name="full_name" class="form-control form-control-sm rounded-3" value="{{ current_user.full_name }}" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Street Address *</label>
+                <input type="text" name="street_address" class="form-control form-control-sm rounded-3" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small fw-bold">Apartment / Suite</label>
+                <input type="text" name="apartment" class="form-control form-control-sm rounded-3">
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label small fw-bold">City *</label>
+                  <input type="text" name="city" class="form-control form-control-sm rounded-3" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-bold">State *</label>
+                  <input type="text" name="state" class="form-control form-control-sm rounded-3" required>
+                </div>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label small fw-bold">Postal Code *</label>
+                  <input type="text" name="postal_code" class="form-control form-control-sm rounded-3" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-bold">Mobile Phone *</label>
+                  <input type="tel" name="phone" class="form-control form-control-sm rounded-3" value="{{ current_user.phone or '' }}" required>
+                </div>
+              </div>
+              <div class="form-check mb-3">
+                <input type="checkbox" name="is_default" class="form-check-input" id="makeDefault" checked>
+                <label class="form-check-label small" for="makeDefault">Set as default shipping address</label>
+              </div>
+              <button type="submit" class="btn btn-solecraft-dark btn-sm w-100">Save Address</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-secondary text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('products.shop') }}" class="text-secondary text-decoration-none">Shop</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('products.shop', category=product.category.slug) }}" class="text-secondary text-decoration-none">{{ product.category.name }}</a></li>
+      <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5">
+    <!-- Gallery Column -->
+    <div class="col-lg-7">
+      <div class="card border-0 rounded-4 overflow-hidden shadow-sm bg-white p-4 text-center position-relative">
+        {% if product.is_bestseller %}
+          <span class="product-card-badge badge-bestseller position-absolute top-0 start-0 m-4">Bestseller</span>
+        {% elif product.has_discount %}
+          <span class="product-card-badge badge-discount position-absolute top-0 start-0 m-4">-{{ product.discount_percent }}% OFF</span>
+        {% endif %}
+
+        <button type="button" class="wishlist-btn position-absolute top-0 end-0 m-4 {{ 'active' if in_wishlist else '' }}" data-product-id="{{ product.id }}">
+          <i class="bi bi-heart{{ '-fill' if in_wishlist else '' }}"></i>
+        </button>
+
+        <!-- Main Display Image -->
+        <div class="py-5 d-flex align-items-center justify-content-center" style="min-height: 420px; background: #F8F8F6; border-radius: 16px;">
+          <img id="mainProductDisplay" src="{{ product.main_image }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 340px; filter: drop-shadow(0 20px 25px rgba(0,0,0,0.15));">
+        </div>
+
+        <!-- Thumbnails Gallery -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <div class="border border-2 border-dark rounded-3 p-2 bg-light cursor-pointer" onclick="document.getElementById('mainProductDisplay').src='{{ product.main_image }}';">
+            <img src="{{ product.main_image }}" alt="Thumbnail 1" style="height: 55px; width: auto;">
+          </div>
+          {% for img in product.images %}
+            {% if img.image_url != product.main_image %}
+            <div class="border rounded-3 p-2 bg-light cursor-pointer" onclick="document.getElementById('mainProductDisplay').src='{{ img.image_url }}';">
+              <img src="{{ img.image_url }}" alt="Thumbnail" style="height: 55px; width: auto;">
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Info Column -->
+    <div class="col-lg-5">
+      <div class="product-category-tag">{{ product.shoe_type }} • {{ product.gender }}</div>
+      <h1 class="fw-bold text-dark mb-2 display-6">{{ product.name }}</h1>
+      <p class="text-muted fst-italic mb-3">{{ product.tagline }}</p>
+
+      <!-- Rating & Reviews Counter -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="text-warning">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <span class="fw-bold small text-dark">{{ product.average_rating }}</span>
+        <span class="text-muted small">({{ product.review_count }} verified reviews)</span>
+        <span class="text-muted small">• SKU: {{ product.sku }}</span>
+      </div>
+
+      <!-- Price Block -->
+      <div class="d-flex align-items-baseline gap-3 mb-4 pb-3 border-bottom">
+        <span class="fs-2 fw-bold text-dark">${{ "%.2f"|format(product.effective_price) }}</span>
+        {% if product.has_discount %}
+          <span class="fs-5 text-muted text-decoration-line-through">${{ "%.2f"|format(product.price) }}</span>
+          <span class="badge bg-danger rounded-pill px-3 py-1">Save {{ product.discount_percent }}%</span>
+        {% endif %}
+      </div>
+
+      <!-- Description -->
+      <p class="text-secondary small leading-relaxed mb-4">
+        {{ product.description }}
+      </p>
+
+      <!-- Specifications Highlights -->
+      <div class="bg-light p-3 rounded-3 mb-4">
+        <div class="row g-2 small">
+          <div class="col-6"><span class="fw-bold text-dark">Material:</span> <span class="text-secondary">{{ product.material }}</span></div>
+          <div class="col-6"><span class="fw-bold text-dark">Colorway:</span> <span class="text-secondary">{{ product.colors }}</span></div>
+          <div class="col-6"><span class="fw-bold text-dark">Origin:</span> <span class="text-secondary">Tuscan Atelier, Italy</span></div>
+          <div class="col-6"><span class="fw-bold text-dark">Stock:</span> <span class="text-success fw-bold">{{ product.stock }} in vault</span></div>
+        </div>
+      </div>
+
+      <!-- Add to Cart Form -->
+      <form action="{{ url_for('cart.add_to_cart') }}" method="POST">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+
+        <!-- Size Selection with Size Guide -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label small fw-bold text-dark mb-0">Select Size</label>
+            <a href="#" class="small text-danger text-decoration-none fw-semibold" data-bs-toggle="modal" data-bs-target="#sizeGuideModal">
+              <i class="bi bi-rulers me-1"></i> Size Guide
+            </a>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            {% for s in product.size_list %}
+            <div>
+              <input type="radio" class="btn-check" name="size" id="size-{{ loop.index }}" value="{{ s }}" {% if loop.first %}checked{% endif %}>
+              <label class="btn btn-outline-dark btn-sm rounded-3 px-3 py-2 fw-semibold" for="size-{{ loop.index }}">{{ s }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Quantity & CTA Buttons -->
+        <div class="row g-2 mb-4">
+          <div class="col-3">
+            <label class="form-label small fw-bold text-dark">Quantity</label>
+            <input type="number" name="quantity" class="form-control rounded-3 text-center fw-bold" value="1" min="1" max="10">
+          </div>
+          <div class="col-9 d-flex align-items-end">
+            <button type="submit" class="btn btn-solecraft-dark w-100 py-2">
+              <i class="bi bi-bag-plus me-2"></i> Add to Bag
+            </button>
+          </div>
+        </div>
+
+        <!-- Action: Customise This Design (Hero Button) -->
+        <div class="d-grid mb-4">
+          <a href="{{ url_for('customizer.studio', product=product.slug) }}" class="btn btn-solecraft-accent py-3 fw-bold shadow-sm">
+            <i class="bi bi-palette-fill me-2"></i> Customise This Silhouette in 3D Studio
+          </a>
+          <small class="text-center text-muted mt-2">
+            Open this model in our Studio to tweak leathers, laces, soles, and deboss your monogram initials.
+          </small>
+        </div>
+      </form>
+
+      <!-- Value Props -->
+      <div class="border-top pt-4">
+        <div class="row g-3 small text-secondary">
+          <div class="col-6 d-flex align-items-center gap-2">
+            <i class="bi bi-truck fs-5 text-dark"></i>
+            <span>Complimentary delivery over $150</span>
+          </div>
+          <div class="col-6 d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-repeat fs-5 text-dark"></i>
+            <span>30-Day Bespoke Guarantee</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER REVIEWS SECTION -->
+  <div class="row mt-5 pt-4 border-top">
+    <div class="col-lg-7">
+      <h3 class="fw-bold text-dark mb-4">Customer Reviews ({{ product.review_count }})</h3>
+      
+      {% if product.reviews %}
+        <div class="d-flex flex-column gap-3">
+          {% for r in product.reviews %}
+          <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="text-warning">
+                {% for i in range(r.rating) %}★{% endfor %}
+              </div>
+              <small class="text-muted">{{ r.created_at.strftime('%B %d, %Y') }}</small>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">{{ r.title or 'Exceptional Quality' }}</h6>
+            <p class="small text-secondary mb-2">{{ r.comment }}</p>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <i class="bi bi-patch-check-fill text-success small"></i>
+              <span class="small fw-bold text-muted">{{ r.user.full_name }} — Verified Purchase</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted">No reviews yet for this silhouette. Be the first to review!</p>
+      {% endif %}
+    </div>
+
+    <!-- Submit Review Form -->
+    <div class="col-lg-5 mt-4 mt-lg-0">
+      <div class="card border-0 rounded-4 p-4 shadow-sm bg-white">
+        <h5 class="fw-bold text-dark mb-3">Write a Customer Review</h5>
+        {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('products.submit_review', product_id=product.id) }}">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Your Rating</label>
+            <select name="rating" class="form-select form-select-sm rounded-3">
+              <option value="5">★★★★★ (5 - Exceptional)</option>
+              <option value="4">★★★★☆ (4 - Great)</option>
+              <option value="3">★★★☆☆ (3 - Average)</option>
+              <option value="2">★★☆☆☆ (2 - Below Expectations)</option>
+              <option value="1">★☆☆☆☆ (1 - Poor)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Headline / Title</label>
+            <input type="text" name="title" class="form-control form-control-sm rounded-3" placeholder="e.g. Best sneakers in my rotation" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Your Review</label>
+            <textarea name="comment" class="form-control form-control-sm rounded-3" rows="4" placeholder="Detail your experience with fit, comfort, and leather patina..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-solecraft-dark btn-sm w-100">Submit Review</button>
+        </form>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="bi bi-chat-heart display-6 text-muted mb-3 d-block"></i>
+          <p class="small text-muted mb-3">Please sign in to leave a verified customer review.</p>
+          <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-solecraft-dark btn-sm">Sign In to Review</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- RELATED PRODUCTS -->
+  {% if related_products %}
+  <div class="mt-5 pt-4">
+    <h3 class="fw-bold text-dark mb-4">Complete the Rotation</h3>
+    <div class="row g-4">
+      {% for rp in related_products %}
+      <div class="col-lg-3 col-sm-6">
+        <div class="product-card">
+          <div class="product-image-wrap">
+            <img src="{{ rp.main_image }}" alt="{{ rp.name }}">
+          </div>
+          <div class="product-info-wrap">
+            <div class="product-category-tag">{{ rp.shoe_type }}</div>
+            <a href="{{ url_for('products.detail', slug=rp.slug) }}" class="product-title">{{ rp.name }}</a>
+            <div class="product-price-row">
+              <span class="product-price">${{ "%.2f"|format(rp.effective_price) }}</span>
+              <a href="{{ url_for('products.detail', slug=rp.slug) }}" class="btn btn-sm btn-outline-dark rounded-pill">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Bespoke Custom Shoe Orders – SOLECRAFT Executive{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 px-lg-5">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <div class="text-warning small text-uppercase fw-bold"><i class="bi bi-hammer me-1"></i> Artisan Cobbler Workbench</div>
+      <h1 class="fw-bold text-dark display-6 mb-0">Bespoke Custom Footwear Queue ({{ custom_items|length }})</h1>
+    </div>
+
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        &larr; Operations Hub
+      </a>
+      <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+        View All Orders
+      </a>
+    </div>
+  </div>
+
+  {% if custom_items %}
+  <div class="row g-4">
+    {% for item in custom_items %}
+    {% set specs = item.get_custom_specs() %}
+    <div class="col-lg-6 col-xl-4">
+      <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden h-100">
+        
+        <!-- Rendered Shoe Stage Header -->
+        <div class="bg-dark p-3 text-center position-relative" style="background: radial-gradient(circle at 50% 50%, #2A2A2E 0%, #111113 100%);">
+          <span class="badge bg-danger position-absolute top-0 start-0 m-3">{{ item.order.status }}</span>
+          <span class="badge bg-light text-dark position-absolute top-0 end-0 m-3">Order: {{ item.order.order_number }}</span>
+          <img src="{{ item.item_image or '/static/images/products/custom-default.svg' }}" alt="{{ item.product_name }}" class="img-fluid my-2" style="max-height: 170px; object-fit: contain;">
+        </div>
+
+        <!-- Specifications Breakdown -->
+        <div class="p-4 d-flex flex-column flex-grow-1">
+          <div class="d-flex justify-content-between align-items-baseline mb-2">
+            <h5 class="fw-bold text-dark mb-0">{{ item.product_name }}</h5>
+            <span class="fs-5 fw-bold text-dark">${{ "%.2f"|format(item.total_price) }}</span>
+          </div>
+
+          <div class="small text-muted mb-3">
+            Customer: <strong>{{ item.order.customer_name }}</strong> ({{ item.order.customer_email }})<br>
+            Size: <strong class="text-danger">{{ item.size }}</strong> • Quantity: {{ item.quantity }}
+          </div>
+
+          <!-- Color Swatches & Specs Table -->
+          <div class="bg-light p-3 rounded-3 mb-3 small">
+            <div class="row g-2">
+              <div class="col-6">
+                <span class="text-muted">Silhouette:</span>
+                <span class="fw-bold">{{ specs.get('shoe_type', 'retro_low').replace('_', ' ').title() }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Material:</span>
+                <span class="fw-bold">{{ specs.get('upper_material', 'Italian Leather') }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Base Color:</span>
+                <span class="d-inline-block rounded-circle border ms-1" style="width: 12px; height: 12px; background: {{ specs.get('base_color', '#FFFFFF') }}; vertical-align: middle;"></span>
+                <span class="font-monospace small">{{ specs.get('base_color', '#FFFFFF') }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Quarter Panel:</span>
+                <span class="d-inline-block rounded-circle border ms-1" style="width: 12px; height: 12px; background: {{ specs.get('upper_color', '#111111') }}; vertical-align: middle;"></span>
+                <span class="font-monospace small">{{ specs.get('upper_color', '#111111') }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Sole Unit:</span>
+                <span class="d-inline-block rounded-circle border ms-1" style="width: 12px; height: 12px; background: {{ specs.get('sole_color', '#FFFFFF') }}; vertical-align: middle;"></span>
+                <span class="font-monospace small">{{ specs.get('sole_color', '#FFFFFF') }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Laces:</span>
+                <span class="d-inline-block rounded-circle border ms-1" style="width: 12px; height: 12px; background: {{ specs.get('lace_color', '#FF6B35') }}; vertical-align: middle;"></span>
+                <span class="font-monospace small">{{ specs.get('lace_color', '#FF6B35') }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Pattern:</span>
+                <span class="fw-bold">{{ specs.get('pattern', 'None').replace('_', ' ').title() }}</span>
+              </div>
+              <div class="col-6">
+                <span class="text-muted">Monogram Foil:</span>
+                {% if specs.get('custom_text') %}
+                  <span class="badge bg-warning text-dark fw-bold font-monospace">{{ specs.get('custom_text') }}</span>
+                {% else %}
+                  <span class="text-muted">None</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Status Update Form -->
+          <div class="mt-auto pt-3 border-top">
+            <form method="POST" action="{{ url_for('admin.update_order_status', order_id=item.order.id) }}" class="d-flex align-items-center gap-2">
+              <label class="form-label small fw-bold text-muted mb-0">Status:</label>
+              <select name="status" class="form-select form-select-sm" onchange="this.form.submit();">
+                <option value="Order Placed" {% if item.order.status == 'Order Placed' %}selected{% endif %}>Order Placed</option>
+                <option value="Processing" {% if item.order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                <option value="Customisation in Progress" {% if item.order.status == 'Customisation in Progress' %}selected{% endif %}>Customisation in Progress</option>
+                <option value="Shipped" {% if item.order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                <option value="Out for Delivery" {% if item.order.status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                <option value="Delivered" {% if item.order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+              </select>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card border-0 rounded-4 p-5 text-center shadow-sm bg-white">
+    <i class="bi bi-hammer display-4 text-muted mb-3"></i>
+    <h4 class="fw-bold text-dark">No custom shoe orders yet</h4>
+    <p class="text-secondary small max-w-400 mx-auto mb-4">When clients customize and order footwear through the 3D Studio, their full material specifications and debossed initials appear here.</p>
+    <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent btn-sm rounded-pill px-4 mx-auto">Open 3D Studio to Test</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

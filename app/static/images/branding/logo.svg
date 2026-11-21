@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" width="320" height="60">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B35" />
+      <stop offset="100%" stop-color="#FF8C5A" />
+    </linearGradient>
+  </defs>
+  <!-- Geometric Sole icon -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="8" width="36" height="24" rx="12" fill="#111111" />
+    <path d="M 6 20 C 14 12, 22 28, 30 20" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <circle cx="30" cy="20" r="3" fill="#FF6B35" />
+  </g>
+  <!-- Text -->
+  <text x="58" y="32" font-family="'Inter', 'Montserrat', -apple-system, sans-serif" font-weight="900" font-size="22" letter-spacing="3" fill="#111111">
+    SOLE<tspan fill="#FF6B35">CRAFT</tspan>
+  </text>
+  <text x="60" y="45" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="7.5" letter-spacing="2.5" fill="#888888">
+    STUDIO LAB • EST 2026
+  </text>
+</svg>

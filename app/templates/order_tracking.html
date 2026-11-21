@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Live Order Tracking – SOLECRAFT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-850 mx-auto">
+    
+    <!-- Tracking Lookup Header / Form -->
+    <div class="text-center mb-5">
+      <div class="text-uppercase fw-bold text-danger small">Real-Time Atelier Tracking</div>
+      <h1 class="fw-bold text-dark display-6 mb-3">Track Your Bespoke Order</h1>
+      <p class="text-secondary small max-w-500 mx-auto">
+        Monitor your footwear journey from pattern cutting and hand-stitching to international white-glove courier delivery.
+      </p>
+
+      <!-- Search / Lookup Input -->
+      <form method="GET" action="{{ url_for('orders.track') }}" class="mt-4 max-w-500 mx-auto">
+        <div class="input-group shadow-sm">
+          <input type="text" name="order_number" class="form-control rounded-pill-start border-secondary px-3" placeholder="Enter Order Number (e.g. SC-2026-89412)" value="{{ order.order_number if order else '' }}" required>
+          <button class="btn btn-solecraft-dark rounded-pill-end px-4" type="submit">
+            <i class="bi bi-search me-1"></i> Track
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if order %}
+    <!-- ORDER STATUS TIMELINE CARD -->
+    <div class="card border-0 rounded-4 shadow-lg bg-white p-4 p-md-5 mb-5">
+      
+      <!-- Order Meta Bar -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-4 mb-4 border-bottom">
+        <div>
+          <span class="badge bg-danger text-uppercase fw-bold px-2 py-1 mb-2">{{ order.status }}</span>
+          <h3 class="fw-bold text-dark mb-0">Order {{ order.order_number }}</h3>
+          <div class="small text-muted mt-1">Placed on {{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+        </div>
+        <div class="mt-3 mt-md-0 text-md-end">
+          <div class="small text-muted">Courier Tracking Number</div>
+          <div class="fw-bold font-monospace text-dark fs-6">{{ order.tracking_number or 'PENDING-GEN' }}</div>
+          <div class="small text-success"><i class="bi bi-shield-check me-1"></i> Signature Required Delivery</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS STEPPER TIMELINE -->
+      <div class="position-relative my-5">
+        
+        <!-- Background Track -->
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-danger" role="progressbar" style="width: {{ progress_percent }}%;"></div>
+        </div>
+
+        <!-- Stepper Nodes -->
+        <div class="d-flex justify-content-between position-absolute top-50 start-0 w-100 translate-middle-y">
+          {% for step in steps %}
+            {% set step_idx = loop.index0 %}
+            <div class="text-center position-relative" style="width: 40px; margin-left: -20px; margin-right: -20px;">
+              <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto border border-3 {{ 'bg-danger text-white border-danger shadow' if step_idx <= current_step_index else 'bg-white text-muted border-secondary' }}" style="width: 38px; height: 38px; font-size: 0.85rem; font-weight: bold;">
+                {% if step_idx < current_step_index %}
+                  ✓
+                {% elif step_idx == current_step_index %}
+                  ●
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </div>
+              <div class="small fw-bold text-dark position-absolute top-100 start-50 translate-middle-x mt-2 text-nowrap d-none d-md-block" style="font-size: 0.72rem;">
+                {{ step }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="d-md-none text-center text-muted small my-3">
+        Current Milestone: <strong class="text-danger">{{ order.status }}</strong>
+      </div>
+
+      <!-- STATUS LOG / STAGE DETAIL -->
+      <div class="bg-light p-4 rounded-4 mt-5 border">
+        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-clock-history text-danger me-2"></i> Live Atelier Log</h6>
+        <p class="small text-secondary mb-0">
+          {% if order.status == 'Order Placed' %}
+            Your order has been officially recorded in our bespoke queue. Customer care is validating the leather specifications and monogram details.
+          {% elif order.status == 'Processing' %}
+            Leather hides and sole units have been allocated from the Tuscan warehouse and queued on the cutting table.
+          {% elif order.status == 'Customisation in Progress' %}
+            Master shoemakers are actively lasting your silhouette, assembling upper panels, and laser debossing your monogram initials.
+          {% elif order.status == 'Shipped' %}
+            Your footwear has cleared final acoustic quality inspection and has been transferred to FedEx Express Priority dispatch.
+          {% elif order.status == 'Out for Delivery' %}
+            Your package is on the local courier truck for today's delivery window.
+          {% elif order.status == 'Delivered' %}
+            Delivered and signed for at destination. Enjoy your bespoke steps!
+          {% else %}
+            Order in transit with standard carrier updates.
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- ORDER ITEMS IN THIS PACKAGE -->
+      <div class="mt-5 pt-3 border-top">
+        <h5 class="fw-bold text-dark mb-3">Footwear in this Delivery</h5>
+        <div class="d-flex flex-column gap-3">
+          {% for item in order.items %}
+          <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-white rounded-2 p-1" style="width: 55px; height: 55px;">
+                <img src="{{ item.item_image or '/static/images/products/custom-default.svg' }}" alt="{{ item.product_name }}" class="img-fluid" style="max-height: 45px; object-fit: contain;">
+              </div>
+              <div>
+                <div class="fw-bold text-dark">{{ item.product_name }}</div>
+                <div class="small text-muted">Size: {{ item.size }} • Quantity: {{ item.quantity }}</div>
+              </div>
+            </div>
+            <div class="fw-bold text-dark">
+              ${{ "%.2f"|format(item.total_price) }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Destination Summary -->
+      <div class="mt-4 text-secondary small">
+        <strong>Delivering to:</strong> {{ order.shipping_address_text }} (Recipient: {{ order.customer_name }}, {{ order.customer_phone }})
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

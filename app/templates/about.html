@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}About SOLECRAFT – Our Heritage & Craftsmanship{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-850 mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div class="text-uppercase fw-bold text-danger small">The SoleCraft Atelier Manifesto</div>
+      <h1 class="fw-bold text-dark display-5 mb-3">Re-Architecting Footwear Through Individual Expression</h1>
+      <p class="fs-5 text-secondary">
+        Founded with a singular radical ambition: to abolish mass-assembly shoe clones and return bespoke, hand-crafted footwear to the creator in all of us.
+      </p>
+    </div>
+
+    <!-- Atelier Hero Graphic -->
+    <div class="card border-0 rounded-4 overflow-hidden shadow-sm bg-dark p-4 p-md-5 text-center text-white mb-5" style="background: linear-gradient(135deg, #111111 0%, #1A1A1E 100%);">
+      <img src="{{ url_for('static', filename='images/products/retro-low-white.svg') }}" alt="Craftsmanship" class="img-fluid my-4" style="max-height: 260px; filter: drop-shadow(0 25px 30px rgba(0,0,0,0.6));">
+      <div class="text-uppercase fw-bold text-warning small">Bespoke Precision</div>
+      <h3 class="fw-bold mt-1">"Your Style. Your Design. Your Sole."</h3>
+    </div>
+
+    <!-- Craftsmanship Pillars -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-6">
+        <div class="card border-0 rounded-4 p-4 shadow-sm bg-white h-100">
+          <div class="fs-2 text-danger mb-2">✦</div>
+          <h4 class="fw-bold text-dark mb-2">Tuscan Full-Grain Leathers</h4>
+          <p class="small text-secondary mb-0">
+            We source exclusively from heritage tanneries in Santa Croce sull'Arno, Italy. Certified vegetable-tanned hides that age gracefully, developing an unmistakable rich patina unique to the wearer's gait.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card border-0 rounded-4 p-4 shadow-sm bg-white h-100">
+          <div class="fs-2 text-danger mb-2">✦</div>
+          <h4 class="fw-bold text-dark mb-2">Zero Overproduction Waste</h4>
+          <p class="small text-secondary mb-0">
+            Over 300 million pairs of mass-produced sneakers end up incinerated or landfilled every year due to overstocking. At SOLECRAFT, we operate on demand: every shoe crafted has an intended owner waiting to walk in it.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card border-0 rounded-4 p-4 shadow-sm bg-white h-100">
+          <div class="fs-2 text-danger mb-2">✦</div>
+          <h4 class="fw-bold text-dark mb-2">Interactive Generative Design</h4>
+          <p class="small text-secondary mb-0">
+            Our Custom Studio harnesses real-time layered vector graphics. What you visualize on your screen is precisely calibrated and matched by our master cobblers during lasting and assembly.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card border-0 rounded-4 p-4 shadow-sm bg-white h-100">
+          <div class="fs-2 text-danger mb-2">✦</div>
+          <h4 class="fw-bold text-dark mb-2">Anatomical Rebound Soles</h4>
+          <p class="small text-secondary mb-0">
+            Comfort without aesthetic compromise. Every sole incorporates dual-density nitrogen-infused core foam, ergonomic arch stabilization, and abrasion-resistant vulcanized rubber.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center py-4 bg-light rounded-4 border p-4">
+      <h3 class="fw-bold text-dark mb-2">Ready to Design Your Legacy?</h3>
+      <p class="small text-muted mb-4">Step inside our studio and personalize every single panel.</p>
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{{ url_for('customizer.studio') }}" class="btn btn-solecraft-accent px-4 py-2">
+          Open Custom Studio
+        </a>
+        <a href="{{ url_for('products.shop') }}" class="btn btn-solecraft-dark px-4 py-2">
+          Explore Ready-to-Wear
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
