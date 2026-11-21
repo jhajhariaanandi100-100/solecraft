@@ -74,3 +74,7 @@ def create_app(config_class='config.Config'):
         seed_initial_data(db)
 
     return app
+
+# Expose app instance so both 'gunicorn app:app' and 'gunicorn run:app' work out-of-the-box
+app = create_app()
+
